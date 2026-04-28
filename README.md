@@ -27,7 +27,8 @@ A minimal, type-safe Tic-Tac-Toe with **dental tooth icons** instead of X and O,
 
 ## ✨ Features
 
-- 🦷 **Dental theme** — `Healthy` (X) vs `Decayed` (O) tooth icons, the strings `X` and `O` never show on screen
+- 🦷 **Dental theme** — `Healthy` (X) vs `Decayed` (O) tooth icons, with a one-click toggle to fall back to classic `X` / `O`
+- 🔀 **Icon style toggle** — Teeth ↔ Classic, persisted in `localStorage` so it survives refreshes
 - 🎮 **Four modes** — Player-vs-Player, Easy (random AI), Medium (heuristic AI), Hard (minimax — unbeatable)
 - 🤖 **Minimax + α-β pruning** — Hard AI never loses, always reaches a draw at worst
 - 🏆 **Persistent best streak** in `localStorage` (`tictactoe.highScore`) across refreshes and modes
@@ -112,6 +113,7 @@ npm run preview
 | **R**                          | New round (after win / draw)            |
 | **N**                          | Cycle through modes (PvP → Easy → …)    |
 | **1** / **2** / **3** / **4**  | Jump to PvP / Easy / Medium / Hard      |
+| **T**                          | Toggle icon style (Teeth ↔ Classic)     |
 | **Esc**                        | Reset session scores                    |
 
 Arrow keys call `preventDefault()` so the page never scrolls during play. Cells are real `<button>` elements with `aria-label`s, so screen readers and `Tab` navigation work natively.
@@ -128,9 +130,16 @@ Tic-Tac-Toe has no continuous score, so this game tracks three things instead:
 
 The best streak is stored under `tictactoe.highScore` and only written when strictly higher than the previous best — it never decreases. Clear your site data to reset it.
 
-## 🦷 Tooth icons
+## 🦷 Tooth icons (with classic fallback)
 
-The game's identity. Two visually distinct molar shapes, both inline SVG, both using `currentColor` for the silhouette stroke so the player colours come from CSS variables.
+The game ships with **two visual styles**, switchable from the header toggle or the **T** key:
+
+- 🦷 **Teeth** *(default)* — `Healthy` molar (X) vs `Decayed` molar with cavity (O), inline SVG with `currentColor` stroke.
+- ✕ ◯ **Classic** — bold, large `X` and `O` glyphs in the same player colours, no icons.
+
+The chosen style is persisted under `tictactoe.iconStyle` in `localStorage`, so refreshing the page keeps your preference. The internal model is unchanged (the marks are still `'X'` and `'O'`); only the rendering swaps.
+
+Two visually distinct molar shapes, both inline SVG, both using `currentColor` for the silhouette stroke so the player colours come from CSS variables.
 
 | Mark | Icon                  | Player colour token | Default light / dark |
 | ---- | --------------------- | ------------------- | -------------------- |

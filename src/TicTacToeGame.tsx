@@ -1,12 +1,14 @@
 import { useCallback, useReducer, useRef } from 'react';
 import { GameBoard } from './components/GameBoard';
 import { GameControls } from './components/GameControls';
+import { IconStyleToggle } from './components/IconStyleToggle';
 import { ModeSelect } from './components/ModeSelect';
 import { Overlay } from './components/Overlay';
 import { ScoreBoard } from './components/ScoreBoard';
 import { useAITurn } from './hooks/useAITurn';
 import { useBestStreak } from './hooks/useBestStreak';
 import { useElapsedSeconds } from './hooks/useElapsedSeconds';
+import { useIconStyle } from './hooks/useIconStyle';
 import { useKeyboardSelect } from './hooks/useKeyboardSelect';
 import { STORAGE_KEY_BEST } from './logic/constants';
 import { advanceGame, createInitialState } from './logic/game';
@@ -36,13 +38,16 @@ export const TicTacToeGame = () => {
 
   const [state, dispatch] = useReducer(reducer, undefined, init);
 
+  const { style: iconStyle, setStyle: setIconStyle, toggle: toggleIconStyle } =
+    useIconStyle();
+
   const bestStreak = useBestStreak(state.currentStreak);
   const isHumanTurn = state.mode === 'pvp' || state.current === state.humanMark;
   const roundKey = `${state.mode}-${state.startingMark}-${state.scores.x + state.scores.o + state.scores.draws}`;
   const elapsed = useElapsedSeconds(state.status, roundKey);
 
   useAITurn(state, dispatch);
-  useKeyboardSelect({ state, dispatch });
+  useKeyboardSelect({ state, dispatch, onToggleIconStyle: toggleIconStyle });
 
   const handleModeChange = (mode: Mode) => dispatch({ type: 'changeMode', mode });
   const handleNewRound = () => dispatch({ type: 'newRound' });
@@ -51,15 +56,22 @@ export const TicTacToeGame = () => {
   const effectiveBest = Math.max(bestStreak, state.bestStreak);
 
   return (
-    <div className="ttt-app" data-mode={state.mode}>
+    <div className="ttt-app" data-mode={state.mode} data-icon-style={iconStyle}>
       <div className="ttt-shell">
         <header className="ttt-header">
-          <h1 className="ttt-title">
-            <span className="ttt-title-icon" aria-hidden="true">🦷</span>
-            Tooth Tac Toe
-          </h1>
+          <div className="ttt-header-row">
+            <h1 className="ttt-title">
+              <span className="ttt-title-icon" aria-hidden="true">
+                {iconStyle === 'classic' ? '✕◯' : '🦷'}
+              </span>
+              {iconStyle === 'classic' ? 'Tic-Tac-Toe' : 'Tooth Tac Toe'}
+            </h1>
+            <IconStyleToggle style={iconStyle} onChange={setIconStyle} />
+          </div>
           <p className="ttt-subtitle">
-            Healthy vs decayed — minimax-hard, keyboard-first.
+            {iconStyle === 'classic'
+              ? 'Classic X / O — minimax-hard, keyboard-first.'
+              : 'Healthy vs decayed — minimax-hard, keyboard-first.'}
           </p>
         </header>
 
@@ -70,6 +82,7 @@ export const TicTacToeGame = () => {
             state={state}
             bestStreak={effectiveBest}
             elapsedSeconds={elapsed}
+            iconStyle={iconStyle}
           />
 
           <div className="ttt-board-frame">
@@ -77,8 +90,13 @@ export const TicTacToeGame = () => {
               state={state}
               dispatch={dispatch}
               isHumanTurn={isHumanTurn}
+              iconStyle={iconStyle}
             />
-            <Overlay state={state} onNewRound={handleNewRound} />
+            <Overlay
+              state={state}
+              iconStyle={iconStyle}
+              onNewRound={handleNewRound}
+            />
           </div>
 
           <GameControls
@@ -93,6 +111,7 @@ export const TicTacToeGame = () => {
               <kbd className="ttt-kbd">R</kbd> new round ·{' '}
               <kbd className="ttt-kbd">N</kbd> cycle mode ·{' '}
               <kbd className="ttt-kbd">1–4</kbd> jump mode ·{' '}
+              <kbd className="ttt-kbd">T</kbd> toggle icons ·{' '}
               <kbd className="ttt-kbd">Esc</kbd> reset scores
             </p>
           </div>

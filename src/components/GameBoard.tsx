@@ -1,3 +1,4 @@
+import type { IconStyle } from '../hooks/useIconStyle';
 import type { GameState, GameAction } from '../logic/types';
 import { Cell } from './Cell';
 import { WinningLine } from './WinningLine';
@@ -6,9 +7,10 @@ export type GameBoardProps = {
   state: GameState;
   dispatch: (action: GameAction) => void;
   isHumanTurn: boolean;
+  iconStyle: IconStyle;
 };
 
-export const GameBoard = ({ state, dispatch, isHumanTurn }: GameBoardProps) => {
+export const GameBoard = ({ state, dispatch, isHumanTurn, iconStyle }: GameBoardProps) => {
   const interactive = state.status === 'playing' && isHumanTurn;
 
   const onSelect = (index: number) => {
@@ -31,6 +33,7 @@ export const GameBoard = ({ state, dispatch, isHumanTurn }: GameBoardProps) => {
             isFocused={state.focusIndex === index}
             isWinning={isWinning}
             isInteractive={interactive}
+            iconStyle={iconStyle}
             onSelect={onSelect}
             onFocusCell={onFocusCell}
           />

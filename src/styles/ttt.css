@@ -46,6 +46,13 @@
 }
 
 .ttt-app .ttt-header { text-align: center; }
+.ttt-app .ttt-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 .ttt-app .ttt-title {
   margin: 0;
   font-size: 28px;
@@ -63,6 +70,52 @@
   margin: 6px 0 0;
   font-size: 13px;
   color: var(--ttt-text-muted);
+}
+
+.ttt-app .ttt-icon-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--ttt-shell-border);
+  border-radius: 999px;
+  padding: 4px;
+}
+.ttt-app .ttt-icon-toggle-btn {
+  appearance: none;
+  background: transparent;
+  color: var(--ttt-text-muted);
+  border: none;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s, color 0.15s, transform 0.15s;
+}
+.ttt-app .ttt-icon-toggle-btn:hover { color: var(--ttt-text); }
+.ttt-app .ttt-icon-toggle-active {
+  background: var(--ttt-x-color);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(59, 130, 246, 0.32);
+}
+.ttt-app .ttt-icon-toggle-icon {
+  font-size: 14px;
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+.ttt-app .ttt-icon-toggle-label {
+  font-size: 12px;
+}
+.ttt-app .ttt-icon-toggle-kbd {
+  margin-left: 2px;
+  padding: 0 4px;
+  display: inline-flex;
+  align-items: center;
 }
 
 .ttt-app .ttt-mode-select {
@@ -234,6 +287,41 @@
   justify-content: center;
   animation: ttt-pop 0.18s ease-out;
 }
+
+.ttt-app .ttt-cell-mark {
+  font-family: ui-rounded, "Inter", system-ui, sans-serif;
+  font-weight: 800;
+  font-size: clamp(36px, 12vw, 84px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: currentColor;
+  text-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+  animation: ttt-pop 0.18s ease-out;
+}
+
+.ttt-app .ttt-score-mark {
+  font-weight: 800;
+  font-size: 22px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+}
+.ttt-app .ttt-mark-x { color: var(--ttt-x-color); }
+.ttt-app .ttt-mark-o { color: var(--ttt-o-color); }
+
+.ttt-app .ttt-overlay-mark {
+  font-weight: 800;
+  font-size: 48px;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.ttt-app .ttt-overlay-icon-x { color: var(--ttt-x-color); }
+.ttt-app .ttt-overlay-icon-o { color: var(--ttt-o-color); }
 
 @keyframes ttt-pop {
   0%   { transform: scale(0.2); opacity: 0; }

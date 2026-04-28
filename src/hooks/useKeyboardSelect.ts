@@ -15,12 +15,14 @@ export type KeyboardSelectOptions = {
   state: GameState;
   dispatch: (action: GameAction) => void;
   onResetRequested?: () => void;
+  onToggleIconStyle?: () => void;
 };
 
 export const useKeyboardSelect = ({
   state,
   dispatch,
   onResetRequested,
+  onToggleIconStyle,
 }: KeyboardSelectOptions): void => {
   useEffect(() => {
     const handler = (event: KeyboardEvent) => {
@@ -88,9 +90,24 @@ export const useKeyboardSelect = ({
         else dispatch({ type: 'resetScores' });
         return;
       }
+
+      if (lower === 't') {
+        if (onToggleIconStyle) {
+          event.preventDefault();
+          onToggleIconStyle();
+        }
+        return;
+      }
     };
 
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [state.focusIndex, state.status, state.mode, dispatch, onResetRequested]);
+  }, [
+    state.focusIndex,
+    state.status,
+    state.mode,
+    dispatch,
+    onResetRequested,
+    onToggleIconStyle,
+  ]);
 };

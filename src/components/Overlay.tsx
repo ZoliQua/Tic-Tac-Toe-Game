@@ -1,19 +1,30 @@
+import type { IconStyle } from '../hooks/useIconStyle';
 import type { GameState } from '../logic/types';
 import { ToothIcon } from './ToothIcon';
 
 export type OverlayProps = {
   state: GameState;
+  iconStyle: IconStyle;
   onNewRound: () => void;
 };
 
-export const Overlay = ({ state, onNewRound }: OverlayProps) => {
+export const Overlay = ({ state, iconStyle, onNewRound }: OverlayProps) => {
   if (state.status !== 'won' && state.status !== 'draw') return null;
 
   const isWin = state.status === 'won';
-  const winnerVariant = state.winner === 'O' ? 'decayed' : 'healthy';
-  const title = isWin
-    ? state.winner === 'X' ? 'Healthy tooth wins!' : 'Decayed tooth wins!'
-    : "It's a draw";
+  const winner = state.winner;
+
+  let title: string;
+  if (isWin && winner) {
+    if (iconStyle === 'classic') {
+      title = `${winner} wins!`;
+    } else {
+      title = winner === 'X' ? 'Healthy tooth wins!' : 'Decayed tooth wins!';
+    }
+  } else {
+    title = "It's a draw";
+  }
+
   const subtitle = isWin
     ? 'Press R or click below for a new round'
     : 'No winning line — try again';
@@ -21,9 +32,13 @@ export const Overlay = ({ state, onNewRound }: OverlayProps) => {
   return (
     <div className="ttt-overlay" role="dialog" aria-live="polite" aria-label={title}>
       <div className="ttt-overlay-card">
-        {isWin && (
-          <div className="ttt-overlay-icon" aria-hidden="true">
-            <ToothIcon variant={winnerVariant} />
+        {isWin && winner && (
+          <div className={`ttt-overlay-icon ttt-overlay-icon-${winner.toLowerCase()}`} aria-hidden="true">
+            {iconStyle === 'classic' ? (
+              <span className="ttt-overlay-mark">{winner}</span>
+            ) : (
+              <ToothIcon variant={winner === 'X' ? 'healthy' : 'decayed'} />
+            )}
           </div>
         )}
         <h2 className="ttt-overlay-title">{title}</h2>

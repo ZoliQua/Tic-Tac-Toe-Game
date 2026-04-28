@@ -1,34 +1,55 @@
 import { formatElapsed } from '../hooks/useElapsedSeconds';
-import type { GameState } from '../logic/types';
+import type { IconStyle } from '../hooks/useIconStyle';
+import type { GameState, Mark } from '../logic/types';
 import { ToothIcon } from './ToothIcon';
 
 export type ScoreBoardProps = {
   state: GameState;
   bestStreak: number;
   elapsedSeconds: number;
+  iconStyle: IconStyle;
 };
 
-const statusLabel = (state: GameState): string => {
-  if (state.status === 'won') {
-    if (state.winner === 'X') return 'Healthy tooth wins!';
-    return 'Decayed tooth wins!';
-  }
+const markName = (mark: Mark, iconStyle: IconStyle): string => {
+  if (iconStyle === 'classic') return mark;
+  return mark === 'X' ? 'Healthy' : 'Decayed';
+};
+
+const winLabel = (winner: Mark, iconStyle: IconStyle): string =>
+  iconStyle === 'classic'
+    ? `${winner} wins!`
+    : winner === 'X' ? 'Healthy tooth wins!' : 'Decayed tooth wins!';
+
+const turnLabel = (state: GameState, iconStyle: IconStyle): string => {
+  if (state.status === 'won' && state.winner) return winLabel(state.winner, iconStyle);
   if (state.status === 'draw') return 'Draw';
   if (state.mode === 'pvp') {
-    return state.current === 'X' ? "Healthy's turn" : "Decayed's turn";
+    return `${markName(state.current, iconStyle)}'s turn`;
   }
-  const aiMark = state.humanMark === 'X' ? 'O' : 'X';
+  const aiMark: Mark = state.humanMark === 'X' ? 'O' : 'X';
   return state.current === aiMark ? 'AI thinking…' : 'Your turn';
 };
 
-export const ScoreBoard = ({ state, bestStreak, elapsedSeconds }: ScoreBoardProps) => {
+const MarkIcon = ({ mark, iconStyle }: { mark: Mark; iconStyle: IconStyle }) => {
+  if (iconStyle === 'classic') {
+    return <span className={`ttt-score-mark ttt-mark-${mark.toLowerCase()}`}>{mark}</span>;
+  }
+  return <ToothIcon variant={mark === 'X' ? 'healthy' : 'decayed'} />;
+};
+
+export const ScoreBoard = ({
+  state,
+  bestStreak,
+  elapsedSeconds,
+  iconStyle,
+}: ScoreBoardProps) => {
   return (
     <div className="ttt-scoreboard">
       <div className="ttt-score ttt-score-x">
         <span className="ttt-score-icon" aria-hidden="true">
-          <ToothIcon variant="healthy" />
+          <MarkIcon mark="X" iconStyle={iconStyle} />
         </span>
-        <span className="ttt-score-label">Healthy</span>
+        <span className="ttt-score-label">{markName('X', iconStyle)}</span>
         <span className="ttt-score-value">{state.scores.x}</span>
       </div>
       <div className="ttt-score ttt-score-draws">
@@ -37,15 +58,15 @@ export const ScoreBoard = ({ state, bestStreak, elapsedSeconds }: ScoreBoardProp
       </div>
       <div className="ttt-score ttt-score-o">
         <span className="ttt-score-icon" aria-hidden="true">
-          <ToothIcon variant="decayed" />
+          <MarkIcon mark="O" iconStyle={iconStyle} />
         </span>
-        <span className="ttt-score-label">Decayed</span>
+        <span className="ttt-score-label">{markName('O', iconStyle)}</span>
         <span className="ttt-score-value">{state.scores.o}</span>
       </div>
       <div className="ttt-meta">
         <span className="ttt-meta-row">
           <span className="ttt-meta-label">Status</span>
-          <span className="ttt-meta-value">{statusLabel(state)}</span>
+          <span className="ttt-meta-value">{turnLabel(state, iconStyle)}</span>
         </span>
         <span className="ttt-meta-row">
           <span className="ttt-meta-label">Streak</span>
