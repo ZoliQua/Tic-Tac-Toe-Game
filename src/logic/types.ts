@@ -10,6 +10,8 @@ export type Mode = 'pvp' | 'easy' | 'medium' | 'hard';
 
 export type Scores = { x: number; o: number; draws: number };
 
+export type BestStreaks = { pvp: number; easy: number; medium: number; hard: number };
+
 export type GameState = {
   board: Board;
   current: Mark;
@@ -20,7 +22,7 @@ export type GameState = {
   humanMark: Mark;
   startingMark: Mark;
   scores: Scores;
-  bestStreak: number;
+  bestStreaks: BestStreaks;
   currentStreak: number;
   moveCount: number;
   focusIndex: number;

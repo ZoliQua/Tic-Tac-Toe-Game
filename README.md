@@ -30,6 +30,11 @@ A minimal, type-safe Tic-Tac-Toe with **dental tooth icons** instead of X and O,
 - 🦷 **Dental theme** — `Healthy` (X) vs `Decayed` (O) tooth icons, with a one-click toggle to fall back to classic `X` / `O`
 - 🔀 **Icon style toggle** — Teeth ↔ Classic, persisted in `localStorage` so it survives refreshes
 - 🎮 **Four modes** — Player-vs-Player, Easy (random AI), Medium (heuristic AI), Hard (minimax — unbeatable)
+- ⚡ **AI speed slider** — Instant / Fast / Normal / Slow, persisted across refreshes
+- 🏆 **Per-mode best streaks** — Easy / Medium / Hard / PvP each track their own all-time record
+- 🔄 **Loser-goes-first** — the previous round's loser opens the next round (drops on draw or first round to strict alternation)
+- 🔔 **Optional sound** — procedural Web Audio beeps on placement, win, and draw, off by default
+- 🛡️ **Esc confirmation** — pressing Esc opens a confirmation dialog before clearing scores; **Shift+Esc** skips it
 - 🤖 **Minimax + α-β pruning** — Hard AI never loses, always reaches a draw at worst
 - 🏆 **Persistent best streak** in `localStorage` (`tictactoe.highScore`) across refreshes and modes
 - ⏱️ **Real-time round timer** (`mm:ss`) that pauses on win or draw
@@ -114,7 +119,8 @@ npm run preview
 | **N**                          | Cycle through modes (PvP → Easy → …)    |
 | **1** / **2** / **3** / **4**  | Jump to PvP / Easy / Medium / Hard      |
 | **T**                          | Toggle icon style (Teeth ↔ Classic)     |
-| **Esc**                        | Reset session scores                    |
+| **Esc**                        | Reset session scores (with confirm)     |
+| **Shift + Esc**                | Reset session scores (no confirm)       |
 
 Arrow keys call `preventDefault()` so the page never scrolls during play. Cells are real `<button>` elements with `aria-label`s, so screen readers and `Tab` navigation work natively.
 

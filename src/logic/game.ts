@@ -1,7 +1,16 @@
 import { bestMove } from './ai';
 import { EMPTY_BOARD } from './grid';
 import { checkWin, isDraw } from './win';
-import type { Board, Cell, GameAction, GameState, Mark, Mode, Rng } from './types';
+import type {
+  BestStreaks,
+  Board,
+  Cell,
+  GameAction,
+  GameState,
+  Mark,
+  Mode,
+  Rng,
+} from './types';
 
 const opposite = (mark: Mark): Mark => (mark === 'X' ? 'O' : 'X');
 
@@ -16,10 +25,17 @@ const placeAt = (board: Board, index: number, mark: Mark): Board => {
   return next as unknown as Board;
 };
 
+export const EMPTY_BEST_STREAKS: BestStreaks = {
+  pvp: 0,
+  easy: 0,
+  medium: 0,
+  hard: 0,
+};
+
 export type CreateInitialOptions = {
   mode?: Mode;
   humanMark?: Mark;
-  bestStreak?: number;
+  bestStreaks?: BestStreaks;
   startingMark?: Mark;
 };
 
@@ -37,7 +53,7 @@ export const createInitialState = (opts: CreateInitialOptions = {}): GameState =
     humanMark,
     startingMark,
     scores: { x: 0, o: 0, draws: 0 },
-    bestStreak: opts.bestStreak ?? 0,
+    bestStreaks: opts.bestStreaks ?? EMPTY_BEST_STREAKS,
     currentStreak: 0,
     moveCount: 0,
     focusIndex: 4,
@@ -58,7 +74,10 @@ const applyResultToScores = (state: GameState, board: Board): GameState => {
       o: state.scores.o + (win.winner === 'O' ? 1 : 0),
     };
     const currentStreak = humanWon ? state.currentStreak + 1 : 0;
-    const bestStreak = Math.max(state.bestStreak, currentStreak);
+    const prevBest = state.bestStreaks[state.mode];
+    const bestStreaks: BestStreaks = currentStreak > prevBest
+      ? { ...state.bestStreaks, [state.mode]: currentStreak }
+      : state.bestStreaks;
 
     return {
       ...state,
@@ -68,7 +87,7 @@ const applyResultToScores = (state: GameState, board: Board): GameState => {
       winningLine: win.line,
       scores,
       currentStreak,
-      bestStreak,
+      bestStreaks,
       moveCount: state.moveCount + 1,
     };
   }
@@ -125,7 +144,11 @@ export const advanceGame = (
     }
 
     case 'newRound': {
-      const nextStarting: Mark = opposite(state.startingMark);
+      // C1 — loser-goes-first: if the previous round had a winner, the
+      // loser opens the next round; on draw or first round, alternate.
+      const nextStarting: Mark = state.winner !== null
+        ? opposite(state.winner)
+        : opposite(state.startingMark);
       return {
         ...state,
         board: EMPTY_BOARD,

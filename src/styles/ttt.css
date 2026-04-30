@@ -451,3 +451,124 @@
   .ttt-app .ttt-title { font-size: 22px; }
   .ttt-app .ttt-meta { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* ---- Settings row (AI speed + sound) ---- */
+.ttt-app .ttt-settings-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+}
+.ttt-app .ttt-settings-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--ttt-shell-border);
+  border-radius: 12px;
+  padding: 6px 10px;
+}
+.ttt-app .ttt-settings-label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--ttt-text-muted);
+  font-weight: 600;
+}
+
+/* ---- Segmented control (used by AI speed) ---- */
+.ttt-app .ttt-segmented {
+  display: inline-flex;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 8px;
+  padding: 3px;
+  gap: 2px;
+}
+.ttt-app .ttt-segmented-btn {
+  appearance: none;
+  background: transparent;
+  color: var(--ttt-text-muted);
+  border: none;
+  border-radius: 6px;
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  font-feature-settings: "tnum";
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.ttt-app .ttt-segmented-btn:hover { color: var(--ttt-text); }
+.ttt-app .ttt-segmented-active {
+  background: var(--ttt-x-color);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.35);
+}
+
+/* ---- Sound toggle ---- */
+.ttt-app .ttt-sound-btn {
+  appearance: none;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--ttt-text-muted);
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 5px 10px;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.15s, color 0.15s;
+}
+.ttt-app .ttt-sound-btn:hover { color: var(--ttt-text); }
+.ttt-app .ttt-sound-on {
+  background: var(--ttt-x-color);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(59, 130, 246, 0.32);
+}
+.ttt-app .ttt-sound-label { font-size: 12px; }
+
+/* ---- Confirm dialog ---- */
+.ttt-app .ttt-confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(8, 12, 30, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  animation: ttt-fade-in 0.15s ease-out;
+}
+.ttt-app .ttt-confirm-card {
+  background: rgba(20, 25, 45, 0.97);
+  border: 1px solid var(--ttt-shell-border);
+  border-radius: 14px;
+  padding: 18px 22px;
+  max-width: 360px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.5);
+}
+.ttt-app .ttt-confirm-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+.ttt-app .ttt-confirm-msg {
+  margin: 0;
+  font-size: 13px;
+  color: var(--ttt-text-muted);
+  line-height: 1.45;
+}
+.ttt-app .ttt-confirm-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 6px;
+}
