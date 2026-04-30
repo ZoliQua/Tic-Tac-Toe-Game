@@ -456,14 +456,18 @@ The two `❌` rows are the only manual changes integration day. Everything else 
 
 ## ❓ Open questions
 
+> Resolved in v1.1 (commit `add C1–C5 feature pack`):
+> - ✅ **Loser-goes-first** — implemented; falls back to strict alternation on draw / first round.
+> - ✅ **Best-streak per mode** — `state.bestStreaks: { pvp, easy, medium, hard }`, persisted under `tictactoe.highScore.{mode}`.
+> - ✅ **AI delay configurability** — `AISpeedToggle` segmented control (Instant / Fast / Normal / Slow), persisted in `localStorage`.
+> - ✅ **Esc confirmation modal** — `ConfirmDialog` on Esc; `Shift+Esc` bypasses.
+> - ✅ **Sound** — procedural Web Audio click / win / draw, `SoundToggle`, off by default.
+
+Still open:
+
 * **Tooth icon style**: cartoon-friendly silhouette vs. anatomically correct molar (cusps, two roots, pulp chamber visible)? The cartoon version reads better at small grid sizes; the anatomical version is more on-brand for the dentist author. Ship cartoon in v1, anatomical as a v1.1 toggle?
 * **X / O assignment**: `X = healthy, O = decayed` (current plan, "good vs. bad" reading) vs. `X = molar, O = incisor` (purely shape-based, no moral overtone). Stick with healthy/decayed?
-* **Loser-goes-first**: currently `startingMark` strictly alternates. Tic-Tac-Toe tradition often gives the previous loser the first move next round (a small comeback mechanic). Implement, or keep strict alternation?
-* **Best-streak weighting**: a streak of 5 Easy wins counts the same as 5 Hard wins (current plan). Alternative: track separate `bestStreak` per mode, expose the maximum to the portal. Or expose only `bestHardStreak` (since Hard is unbeatable, even reaching streak `1` is impossible — drawing forever still gives `0`). The current plan is the simplest; flag if Hard makes the streak useless.
-* **AI delay configurability**: 400 ms hard-coded vs. user-tunable slider (e.g., 100 ms / 400 ms / 1000 ms)?
 * **PvP turn indicator**: in PvP mode, who's-next is more important than vs-AI mode. Show a large coloured banner ("X to move" with the healthy tooth icon), or just rely on the focus indicator and scoreboard?
-* **Confirmation dialogs**: `Esc` resets session scores. Confirm in a modal, or just commit and rely on the user being able to reset back? (Snake/Tetris/2048 don't have score-reset commands at all.)
-* **Sound**: explicitly out of scope for v1. Reconsider for v1.1 (subtle "click" on placement, "ding" on win, "tick" on draw)?
 * **Keyboard shortcut for "swap which mark you play"**: currently human is always X. Allow human-as-O for variety (so AI moves first and the human reacts)?
 
 ---
