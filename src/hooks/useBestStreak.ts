@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
-import { STORAGE_KEY_BEST } from '../logic/constants';
+import { STREAK_KEY_PREFIX } from '../logic/constants';
 import { EMPTY_BEST_STREAKS } from '../logic/game';
 import type { BestStreaks, Mode } from '../logic/types';
 
 const MODES: readonly Mode[] = ['pvp', 'easy', 'medium', 'hard'] as const;
 
-const keyFor = (mode: Mode): string => `${STORAGE_KEY_BEST}.${mode}`;
-const LEGACY_KEY = STORAGE_KEY_BEST; // pre-C3 single-key best streak
+const keyFor = (mode: Mode): string => `${STREAK_KEY_PREFIX}.${mode}`;
+const LEGACY_KEY = STREAK_KEY_PREFIX; // pre-C3 single-key best streak
 
 const readOne = (mode: Mode): number => {
   try {

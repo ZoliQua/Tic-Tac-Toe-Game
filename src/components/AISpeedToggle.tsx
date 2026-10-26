@@ -12,30 +12,17 @@ const OPTIONS: ReadonlyArray<{ id: AISpeed; label: string; hint: string }> = [
   { id: 'slow', label: '1s', hint: 'Slow (1000 ms)' },
 ];
 
-export const AISpeedToggle = ({ speed, onChange }: AISpeedToggleProps) => {
-  return (
-    <div className="ttt-settings-group" role="radiogroup" aria-label="AI speed">
-      <span className="ttt-settings-label">AI delay</span>
-      <div className="ttt-segmented">
-        {OPTIONS.map(({ id, label, hint }) => {
-          const active = id === speed;
-          return (
-            <button
-              type="button"
-              key={id}
-              role="radio"
-              aria-checked={active}
-              title={hint}
-              className={`ttt-segmented-btn${active ? ' ttt-segmented-active' : ''}`}
-              onClick={() => onChange(id)}
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
+export const AISpeedToggle = ({ speed, onChange }: AISpeedToggleProps) => (
+  <div className="arc-field" role="group" aria-label="AI delay">
+    <span>AI delay</span>
+    <div className="arc-segmented">
+      {OPTIONS.map(({ id, label, hint }) => (
+        <button type="button" key={id} aria-pressed={id === speed} title={hint} onClick={() => onChange(id)}>
+          {label}
+        </button>
+      ))}
     </div>
-  );
-};
+  </div>
+);
 
 export default AISpeedToggle;

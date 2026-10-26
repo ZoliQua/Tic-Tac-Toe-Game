@@ -11,12 +11,18 @@ export const WINNING_LINES: readonly WinningLine[] = [
   [2, 4, 6],
 ] as const;
 
+export const BOARD_CELLS = 9;
+
+/** Default AI "thinking" delay (the Normal AI speed). */
 export const AI_DELAY_MS = 400;
 
-export const PLACE_ANIMATION_MS = 150;
-export const STRIKE_ANIMATION_MS = 320;
-
-export const STORAGE_KEY_BEST = 'tictactoe.highScore';
+/**
+ * Prefix of the per-mode all-time best win streak keys
+ * (`tictactoe.highScore.<mode>`). The name predates the arcade kit and is kept
+ * so existing records survive; the value is a streak, not a score, so it is
+ * deliberately NOT registered as the kit's `legacyBestKey`.
+ */
+export const STREAK_KEY_PREFIX = 'tictactoe.highScore';
 
 export const CORNERS = [0, 2, 6, 8] as const;
 export const EDGES = [1, 3, 5, 7] as const;

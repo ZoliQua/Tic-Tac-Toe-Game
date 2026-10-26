@@ -1,4 +1,5 @@
 export { TicTacToeGame } from './TicTacToeGame';
+export { TicTacToeDemo } from './demo/TicTacToeDemo';
 export { default } from './TicTacToeGame';
 export type {
   Board,
@@ -8,5 +9,6 @@ export type {
   GameStatus,
   Mark,
   Mode,
+  SavedGame,
   WinningLine,
 } from './logic/types';

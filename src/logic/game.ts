@@ -1,4 +1,6 @@
+import { duelRoundScore, type DuelDifficulty, type RunOutcome } from '../arcade';
 import { bestMove } from './ai';
+import { BOARD_CELLS } from './constants';
 import { EMPTY_BOARD } from './grid';
 import { checkWin, isDraw } from './win';
 import type {
@@ -12,11 +14,28 @@ import type {
   Rng,
 } from './types';
 
-const opposite = (mark: Mark): Mark => (mark === 'X' ? 'O' : 'X');
+export const opposite = (mark: Mark): Mark => (mark === 'X' ? 'O' : 'X');
 
-const aiMarkFor = (state: Pick<GameState, 'mode' | 'humanMark'>): Mark | null => {
+export const MODES: readonly Mode[] = ['pvp', 'easy', 'medium', 'hard'] as const;
+
+/** The AI's mark, or null in local two-player mode. */
+export const aiMarkFor = (state: Pick<GameState, 'mode' | 'humanMark'>): Mark | null => {
   if (state.mode === 'pvp') return null;
   return opposite(state.humanMark);
+};
+
+/** Difficulty fed to `duelRoundScore`; null (unranked) for PvP. */
+export const difficultyFor = (mode: Mode): DuelDifficulty | null => (mode === 'pvp' ? null : mode);
+
+/**
+ * How a finished round ended from the human's side. In PvP the "human" is
+ * player 1 (`humanMark`, X): the round is unranked there anyway.
+ */
+export const roundOutcome = (
+  state: Pick<GameState, 'status' | 'winner' | 'humanMark'>,
+): RunOutcome => {
+  if (state.status === 'draw' || state.winner === null) return 'draw';
+  return state.winner === state.humanMark ? 'win' : 'loss';
 };
 
 const placeAt = (board: Board, index: number, mark: Mark): Board => {
@@ -57,17 +76,28 @@ export const createInitialState = (opts: CreateInitialOptions = {}): GameState =
     currentStreak: 0,
     moveCount: 0,
     focusIndex: 4,
+    points: 0,
+    roundScore: 0,
   };
 };
 
+/** Scores a finished round with the shared arcade duel formula. */
+const scoreRound = (state: GameState): GameState => {
+  const roundScore = duelRoundScore({
+    outcome: roundOutcome(state),
+    difficulty: difficultyFor(state.mode),
+    moves: state.moveCount,
+    boardCells: BOARD_CELLS,
+  });
+  return { ...state, roundScore, points: state.points + roundScore };
+};
+
 const applyResultToScores = (state: GameState, board: Board): GameState => {
+  const moveCount = state.moveCount + 1;
   const win = checkWin(board);
   if (win) {
-    const aiMark = aiMarkFor(state);
-    const humanWon = aiMark === null
-      ? win.winner === 'X' // PvP: count X wins toward streak (humanMark default)
-      : win.winner === state.humanMark;
-
+    // PvP counts player 1 (humanMark) wins toward the streak.
+    const humanWon = win.winner === state.humanMark;
     const scores = {
       ...state.scores,
       x: state.scores.x + (win.winner === 'X' ? 1 : 0),
@@ -79,7 +109,7 @@ const applyResultToScores = (state: GameState, board: Board): GameState => {
       ? { ...state.bestStreaks, [state.mode]: currentStreak }
       : state.bestStreaks;
 
-    return {
+    return scoreRound({
       ...state,
       board,
       status: 'won',
@@ -88,12 +118,12 @@ const applyResultToScores = (state: GameState, board: Board): GameState => {
       scores,
       currentStreak,
       bestStreaks,
-      moveCount: state.moveCount + 1,
-    };
+      moveCount,
+    });
   }
 
   if (isDraw(board)) {
-    return {
+    return scoreRound({
       ...state,
       board,
       status: 'draw',
@@ -101,21 +131,21 @@ const applyResultToScores = (state: GameState, board: Board): GameState => {
       winningLine: null,
       scores: { ...state.scores, draws: state.scores.draws + 1 },
       currentStreak: 0,
-      moveCount: state.moveCount + 1,
-    };
+      moveCount,
+    });
   }
 
   return {
     ...state,
     board,
     current: opposite(state.current),
-    moveCount: state.moveCount + 1,
+    moveCount,
   };
 };
 
 const tryPlace = (state: GameState, index: number, mark: Mark): GameState => {
   if (state.status !== 'playing') return state;
-  if (index < 0 || index > 8) return state;
+  if (!Number.isInteger(index) || index < 0 || index > 8) return state;
   if (state.board[index] !== null) return state;
   if (state.current !== mark) return state;
   const next = placeAt(state.board, index, mark);
@@ -130,8 +160,12 @@ export const advanceGame = (
   ctx: AdvanceContext,
 ): GameState => {
   switch (action.type) {
-    case 'place':
+    case 'place': {
+      // A human may only place on their own turn; in PvP both marks are human.
+      const aiMark = aiMarkFor(state);
+      if (aiMark !== null && state.current === aiMark) return state;
       return tryPlace(state, action.index, state.current);
+    }
 
     case 'aiMove': {
       if (state.status !== 'playing') return state;
@@ -144,8 +178,8 @@ export const advanceGame = (
     }
 
     case 'newRound': {
-      // C1 — loser-goes-first: if the previous round had a winner, the
-      // loser opens the next round; on draw or first round, alternate.
+      // Loser-goes-first: if the previous round had a winner, the loser opens
+      // the next round; on a draw, an abandoned round or the first round, alternate.
       const nextStarting: Mark = state.winner !== null
         ? opposite(state.winner)
         : opposite(state.startingMark);
@@ -159,10 +193,12 @@ export const advanceGame = (
         startingMark: nextStarting,
         moveCount: 0,
         focusIndex: 4,
+        roundScore: 0,
       };
     }
 
     case 'changeMode': {
+      // A new mode starts a new match: scores, streak and points reset.
       const startingMark: Mark = 'X';
       return {
         ...state,
@@ -177,6 +213,8 @@ export const advanceGame = (
         currentStreak: 0,
         moveCount: 0,
         focusIndex: 4,
+        points: 0,
+        roundScore: 0,
       };
     }
 
@@ -185,10 +223,11 @@ export const advanceGame = (
         ...state,
         scores: { x: 0, o: 0, draws: 0 },
         currentStreak: 0,
+        points: 0,
       };
 
     case 'focus': {
-      if (action.index < 0 || action.index > 8) return state;
+      if (!Number.isInteger(action.index) || action.index < 0 || action.index > 8) return state;
       return { ...state, focusIndex: action.index };
     }
   }

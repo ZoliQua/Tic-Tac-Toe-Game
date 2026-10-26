@@ -4,7 +4,11 @@ export type Board = readonly [Cell, Cell, Cell, Cell, Cell, Cell, Cell, Cell, Ce
 
 export type WinningLine = readonly [number, number, number];
 
-export type GameStatus = 'idle' | 'playing' | 'won' | 'draw';
+/**
+ * Round state of the pure engine. The arcade lifecycle (idle / running /
+ * paused / gameOver) is layered on top of it in TicTacToeGame.tsx.
+ */
+export type GameStatus = 'playing' | 'won' | 'draw';
 
 export type Mode = 'pvp' | 'easy' | 'medium' | 'hard';
 
@@ -24,9 +28,17 @@ export type GameState = {
   scores: Scores;
   bestStreaks: BestStreaks;
   currentStreak: number;
+  /** Marks placed by both sides in the current round. */
   moveCount: number;
   focusIndex: number;
+  /** Session (match) total of round scores — `duelRoundScore` summed. */
+  points: number;
+  /** Score of the current round: 0 while playing, set when the round ends. */
+  roundScore: number;
 };
+
+/** What a saved session stores: the whole match except the all-time best streaks. */
+export type SavedGame = Omit<GameState, 'bestStreaks'>;
 
 export type GameAction =
   | { type: 'place'; index: number }

@@ -1,0 +1,171 @@
+/* Board, cells and marks. CSS Module: every class is locally scoped. */
+
+.board {
+  /* Game-identity colours: read well on both the dark and the light theme. */
+  --ttt-x-color: #4a8cf0;
+  --ttt-o-color: #c9933f;
+  --ttt-tooth-fill: #fbf8ee;
+  --ttt-cavity-color: #3f2a1a;
+
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 8px;
+  width: min(72vmin, 480px);
+  aspect-ratio: 1 / 1;
+  padding: 10px;
+  background: var(--grid-line);
+  border: 1px solid var(--panel-border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.mini {
+  width: auto;
+  height: 88%;
+  gap: 3px;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  box-shadow: none;
+}
+
+.cell {
+  appearance: none;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 1px solid var(--panel-border);
+  border-radius: var(--radius-md);
+  background: var(--grid-empty);
+  color: inherit;
+  font: inherit;
+  cursor: default;
+  outline: none;
+  transition: background 120ms ease, border-color 120ms ease, box-shadow 160ms ease;
+}
+
+.mini .cell {
+  border-radius: 3px;
+}
+
+.playable {
+  cursor: pointer;
+}
+
+.playable:hover {
+  background: var(--panel-bg-soft);
+  border-color: var(--game-color, var(--accent));
+}
+
+.focused {
+  border-color: var(--game-color, var(--accent));
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--game-color, var(--accent)) 45%, transparent) inset;
+}
+
+.cell:focus-visible {
+  outline: 2px solid var(--accent-ring);
+  outline-offset: 2px;
+}
+
+.x {
+  color: var(--ttt-x-color);
+}
+
+.o {
+  color: var(--ttt-o-color);
+}
+
+.winning {
+  background: color-mix(in oklab, var(--ok) 14%, var(--grid-empty));
+  border-color: color-mix(in oklab, var(--ok) 55%, transparent);
+}
+
+.icon {
+  display: inline-flex;
+  width: 72%;
+  height: 72%;
+  animation: ttt-pop 180ms ease-out;
+}
+
+.glyph {
+  font-family: var(--font-sans);
+  font-weight: 800;
+  font-size: clamp(32px, 11vmin, 84px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  animation: ttt-pop 180ms ease-out;
+}
+
+.mini .glyph {
+  font-size: 22px;
+}
+
+.draw .icon,
+.draw .glyph {
+  animation: ttt-shimmer 420ms ease-out;
+}
+
+.strike {
+  position: absolute;
+  inset: 10px;
+  width: calc(100% - 20px);
+  height: calc(100% - 20px);
+  color: var(--ok);
+  pointer-events: none;
+}
+
+.mini .strike {
+  inset: 4px;
+  width: calc(100% - 8px);
+  height: calc(100% - 8px);
+}
+
+.strikeStroke {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: ttt-strike 340ms 50ms ease-out forwards;
+}
+
+@keyframes ttt-pop {
+  0% {
+    transform: scale(0.2);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes ttt-strike {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes ttt-shimmer {
+  50% {
+    filter: grayscale(1) opacity(0.6);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon,
+  .glyph,
+  .draw .icon,
+  .draw .glyph {
+    animation: none;
+  }
+  .strikeStroke {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

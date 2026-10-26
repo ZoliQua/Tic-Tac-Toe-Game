@@ -1,5 +1,8 @@
 # 🦷 Tic-Tac-Toe — GAME-PLAN.md
 
+> **Historical document.** This is the original v1 design plan. Since v2.0.0 the game runs on the shared
+> Zoltan's Arcade kit (scoring, stats, sessions, keys, styling) — see README.md, CLAUDE.md and CHANGELOG.md for the current behaviour.
+
 Development plan for a minimal, type-safe Tic-Tac-Toe with **dental-themed tooth icons**,
 built in the same spirit as
 [ZoliQua/Snake-Game](https://github.com/ZoliQua/Snake-Game),
