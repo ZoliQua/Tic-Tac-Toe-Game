@@ -1,7 +1,9 @@
 # 🦷 Tic-Tac-Toe — Tooth Edition
 
-A minimal, type-safe Tic-Tac-Toe with **dental tooth icons** instead of X and O, built with **React 18**, **Vite**, and **TypeScript**. Keyboard-first, grid-based, no canvas, no external game engine.
+A minimal, type-safe Tic-Tac-Toe with **dental tooth icons** (or classic X / O) built with **React 18**, **Vite** and **TypeScript** — keyboard-first, grid-based DOM, no canvas, no game engine.
+Runs on its own **and** as one of the six games of **[Zoltan's Arcade](https://github.com/ZoliQua/Arcade-Game-Center)**.
 
+[![CI](https://github.com/ZoliQua/Tic-Tac-Toe-Game/actions/workflows/ci.yml/badge.svg)](https://github.com/ZoliQua/Tic-Tac-Toe-Game/actions/workflows/ci.yml)
 ![license](https://img.shields.io/badge/license-MIT-green)
 ![node](https://img.shields.io/badge/node-%E2%89%A520-339933?logo=node.js&logoColor=white)
 ![react](https://img.shields.io/badge/React-18-61dafb?logo=react&logoColor=white)
@@ -12,207 +14,234 @@ A minimal, type-safe Tic-Tac-Toe with **dental tooth icons** instead of X and O,
 
 ## 📑 Table of contents
 
+- [The Zoltan's Arcade family](#-the-zoltans-arcade-family)
 - [Features](#-features)
+- [Quick start](#-quick-start)
+- [Controls](#%EF%B8%8F-controls)
+- [Scoring & stats](#-scoring--stats)
+- [Autosave & resume](#-autosave--resume)
+- [Embedding in Arcade-Game-Center](#-embedding-in-arcade-game-center)
 - [How it works](#-how-it-works)
-- [Game modes & AI](#-game-modes--ai)
-- [Requirements](#-requirements)
-- [Installation](#-installation)
-- [Usage](#-usage)
-- [Controls](#-controls)
-- [Scoring](#-scoring)
-- [Tooth icons](#-tooth-icons)
 - [Scripts](#-scripts)
-- [Architecture](#-architecture)
-- [License](#-license)
+- [Architecture](#%EF%B8%8F-architecture)
+- [Contributing](#-contributing)
+- [License](#%EF%B8%8F-license)
+
+## 🕹️ The Zoltan's Arcade family
+
+Every game is a standalone repo that also plugs into the portal. They share one design system, one scoring model and one save format through the vendored [`src/arcade/`](./src/arcade) kit.
+
+| Game | Repo | Genre |
+| --- | --- | --- |
+| 🏠 **Arcade portal** | [Arcade-Game-Center](https://github.com/ZoliQua/Arcade-Game-Center) | All games in one place, live demos, stats, leaderboard |
+| 🧱 Tetris | [Tetris-Game](https://github.com/ZoliQua/Tetris-Game) | Arcade |
+| 🐍 Snake | [Snake-Game](https://github.com/ZoliQua/Snake-Game) | Reflex |
+| 🔢 2048 | [2048-Game](https://github.com/ZoliQua/2048-Game) | Puzzle |
+| 🟡 Pac-Man | [Pac-Man-Game](https://github.com/ZoliQua/Pac-Man-Game) | Maze |
+| ⚫ Gomoku | [Gomoku-Game](https://github.com/ZoliQua/Gomoku-Game) | Strategy |
+| 🦷 **Tic-Tac-Toe** (this repo) | [Tic-Tac-Toe-Game](https://github.com/ZoliQua/Tic-Tac-Toe-Game) | Duel |
 
 ## ✨ Features
 
-- 🦷 **Dental theme** — `Healthy` (X) vs `Decayed` (O) tooth icons, with a one-click toggle to fall back to classic `X` / `O`
-- 🔀 **Icon style toggle** — Teeth ↔ Classic, persisted in `localStorage` so it survives refreshes
-- 🎮 **Four modes** — Player-vs-Player, Easy (random AI), Medium (heuristic AI), Hard (minimax — unbeatable)
-- ⚡ **AI speed slider** — Instant / Fast / Normal / Slow, persisted across refreshes
-- 🏆 **Per-mode best streaks** — Easy / Medium / Hard / PvP each track their own all-time record
-- 🔄 **Loser-goes-first** — the previous round's loser opens the next round (drops on draw or first round to strict alternation)
-- 🔔 **Optional sound** — procedural Web Audio beeps on placement, win, and draw, off by default
-- 🛡️ **Esc confirmation** — pressing Esc opens a confirmation dialog before clearing scores; **Shift+Esc** skips it
-- 🤖 **Minimax + α-β pruning** — Hard AI never loses, always reaches a draw at worst
-- 🏆 **Persistent best streak** in `localStorage` (`tictactoe.highScore`) across refreshes and modes
-- ⏱️ **Real-time round timer** (`mm:ss`) that pauses on win or draw
-- ⌨️ **Keyboard-first** — arrows + WASD, Enter/Space to place, R for new round, 1–4 to jump modes
-- ✨ **CSS-only animations** — tooth pop on placement, animated SVG strikethrough on the winning line
-- 🧼 **Pure game logic** separated from UI — `src/logic/*` and `src/hooks/*` never import from `components/`
-- 🎨 **Plain CSS** scoped under `.ttt-app` — drop-in compatible with the `Arcade-Game-Center` portal
-- 🔒 **Type-safe** — strict TypeScript, no `any` escape hatches in game code, length-9 tuple board
+- 🦷 **Dental theme** — `Healthy` (X) vs `Decayed` (O) tooth icons, with a toggle (or **I**) to classic `X` / `O`; the choice is remembered
+- 🎮 **Four modes** — Player-vs-Player, Easy (random AI), Medium (heuristic AI), Hard (α-β minimax — **never loses**)
+- 🏆 **Unified arcade scoring** — every round is scored with the shared duel formula; best score, plays and wins are shared with the portal
+- 🔥 **Per-mode best streaks** — PvP / Easy / Medium / Hard each keep their own all-time win-streak record
+- 🔄 **Loser-goes-first** — the previous round's loser opens the next round (draws and abandoned rounds alternate)
+- ⏸️ **Pause** (P / Esc) — freezes the board, the AI and the round timer
+- 💾 **Autosave & resume** — the whole match (board, scores, streak, points) survives reloads and tab closes
+- ⚡ **AI speed** — Instant / 0.15 s / 0.4 s / 1 s thinking delay, remembered
+- 🔔 **Optional sound** — procedural Web Audio beeps on placement, win and draw; off by default
+- 🌗 **Dark / light theme** shared with every arcade game (press **T**)
+- 🤖 **Attract-mode demo** (`<TicTacToeDemo />`) — two AIs of mixed strength play the real engine on the portal's landing page
+- ⌨️ **Keyboard-first**; hotkeys are ignored while you type in a form field or hold Cmd/Ctrl/Alt
+- 🧪 **Tested** — every winning line, draws, an *exhaustive* proof that the hard AI never loses, scoring, the save validator and component behaviour
 
-## 🧠 How it works
+## 🚀 Quick start
 
-The game is a small state machine driven by a single pure reducer:
-
-```
-idle → playing ──┬── (winning move) ──→ won
-                 └── (board fills, no winner) → draw
-
-won  → (R / new round) → playing
-draw → (R / new round) → playing
-```
-
-`advanceGame(state, action, ctx): GameState` owns every transition:
-
-1. **`place`** — drops the current player's mark on an empty cell. Filled-cell clicks are silent no-ops.
-2. **`aiMove`** — `bestMove(board, mark, mode, rng)` picks a move under the current mode's strategy. RNG is injected so tests are deterministic.
-3. **Win check first**, then draw check — a winning move on cell #9 is always recorded as `won`, never `draw`.
-4. **Streak bookkeeping** — `currentStreak` increments only on a human win, resets on any loss or draw. `bestStreak` only ever increases.
-5. **`newRound`** — clears the board, alternates the starting mark, keeps session scores. **`changeMode`** resets session scores too.
-
-A small React hook (`useAITurn`) watches the state and dispatches `aiMove` after a 400 ms delay when it's the AI's turn — the timer is cancelled on every state change and on unmount, so no stale move ever fires after a new round, mode change, or unmount.
-
-## 🤖 Game modes & AI
-
-| Mode      | Player 1 (X)      | Player 2 (O)            | Winnable?                          |
-| --------- | ----------------- | ----------------------- | ---------------------------------- |
-| **PvP**   | Human             | Human (same device)     | Yes, by either player              |
-| **Easy**  | Human             | AI (uniform random)     | Yes, almost always                 |
-| **Medium**| Human             | AI (5-step heuristic)   | Yes, with effort                   |
-| **Hard**  | Human             | AI (full α-β minimax)   | **Never.** Best result is a draw.  |
-
-The Medium AI follows a tight 5-step priority: take the win → block the opponent's win → take the centre → take a random empty corner → take a random empty edge. The Hard AI runs full minimax over the 3×3 game tree (`< 1 ms` per move) with `+10 - depth` for a win, `depth - 10` for a loss, `0` for a draw — so it prefers shorter wins and longer losses.
-
-## 📦 Requirements
-
-- 🟢 **Node ≥ 20**
-- 📦 **npm** (the lockfile is committed as `package-lock.json`)
-
-## 🚀 Installation
+Requires **Node ≥ 20** and npm.
 
 ```bash
 git clone https://github.com/ZoliQua/Tic-Tac-Toe-Game.git
 cd Tic-Tac-Toe-Game
 npm install
+npm run dev          # http://localhost:5173
 ```
 
-## 🕹️ Usage
-
-Start the dev server:
-
-```bash
-npm run dev
-```
-
-Then open `http://localhost:5173` in a modern desktop browser.
-
-For a production build:
-
-```bash
-npm run build
-npm run preview
-```
+Production build: `npm run build && npm run preview`. The build uses relative asset paths, so `dist/` can be served from any sub-folder.
 
 ## ⌨️ Controls
 
-| Key                            | Action                                  |
-| ------------------------------ | --------------------------------------- |
-| 🖱️ Click / Touch              | Place mark on the chosen cell           |
-| ⬆️ / ⬇️ / ⬅️ / ➡️             | Move the focus indicator                |
-| **W** / **A** / **S** / **D**  | Move the focus indicator (alternate)    |
-| **Enter** / **Space**          | Place mark on the focused cell          |
-| **R**                          | New round (after win / draw)            |
-| **N**                          | Cycle through modes (PvP → Easy → …)    |
-| **1** / **2** / **3** / **4**  | Jump to PvP / Easy / Medium / Hard      |
-| **T**                          | Toggle icon style (Teeth ↔ Classic)     |
-| **Esc**                        | Reset session scores (with confirm)     |
-| **Shift + Esc**                | Reset session scores (no confirm)       |
+| Key | Action |
+| --- | --- |
+| 🖱️ Click / tap | Place your mark on a cell |
+| ⬆️ ⬇️ ⬅️ ➡️ / **W A S D** | Move the cell cursor (clamped, no row wrap) |
+| **Enter** / **Space** | Place on the cursor · start · resume · next round |
+| **P** / **Esc** | Pause / resume |
+| **R** | New round (keeps the match scores) |
+| **N** | Cycle mode (PvP → Easy → Medium → Hard) |
+| **1** / **2** / **3** / **4** | Jump to PvP / Easy / Medium / Hard (starts a new match) |
+| **I** | Toggle marks: teeth ↔ classic X / O |
+| **C** | Reset match scores (asks first — **Enter** confirms, **Esc** keeps) |
+| **Shift + C** | Reset match scores without asking |
+| **T** | Toggle dark / light theme (standalone page) |
 
-Arrow keys call `preventDefault()` so the page never scrolls during play. Cells are real `<button>` elements with `aria-label`s, so screen readers and `Tab` navigation work natively.
+> Before v2, **Esc** opened the reset-scores confirmation and **T** toggled the icons. Esc is now the arcade-wide pause key
+> and T the arcade-wide theme key, so those moved to **C** (plus the *Reset scores* button) and **I**.
 
-## 🎯 Scoring
+Arrow keys call `preventDefault()` so the page never scrolls. Cells are real `<button>`s with `aria-label`s (`Row 1, column 3, healthy tooth`).
 
-Tic-Tac-Toe has no continuous score, so this game tracks three things instead:
+## 🎯 Scoring & stats
 
-| Stat               | Meaning                                                                    |
-| ------------------ | -------------------------------------------------------------------------- |
-| **Session scores** | `{ X wins, O wins, draws }` for the current mode. Resets on mode change.   |
-| **Current streak** | Consecutive **human** wins in the current session. Resets on loss or draw. |
-| **Best streak**    | Longest human win streak ever, across all modes. Persisted in `localStorage`. |
+Each **round is one arcade run**. When a round ends it is scored with the kit's shared `duelRoundScore` (the same formula Gomoku uses),
+from the human's side, with `moves` = marks placed by both players and `boardCells` = 9:
 
-The best streak is stored under `tictactoe.highScore` and only written when strictly higher than the previous best — it never decreases. Clear your site data to reset it.
+| Result | Points | Easy (base 100) | Medium (base 250) | Hard (base 500) |
+| --- | --- | --- | --- | --- |
+| Win | `base × (1 + empty cells / 9)` | 144 (5-move win) … 100 | 361 … 250 | **722** … 500 |
+| Draw | `base / 4` | 25 | 63 | 125 |
+| Loss | 0 | 0 | 0 | 0 |
+| PvP | 0 — unranked | | | |
 
-## 🦷 Tooth icons (with classic fallback)
+Faster wins leave more of the board empty and pay more. A draw against the unbeatable Hard AI still earns points.
 
-The game ships with **two visual styles**, switchable from the header toggle or the **T** key:
+The stat strip shows:
 
-- 🦷 **Teeth** *(default)* — `Healthy` molar (X) vs `Decayed` molar with cavity (O), inline SVG with `currentColor` stroke.
-- ✕ ◯ **Classic** — bold, large `X` and `O` glyphs in the same player colours, no icons.
+| Stat | Meaning |
+| --- | --- |
+| **Points** | Match total of round scores in the current mode (saved with the session; reset on mode change, *Reset scores* or *Discard*) |
+| **Best** | Best single-round score ever (`arcade.stats.tictactoe`, shared with the portal) |
+| **W–L–D** | Your wins – AI wins – draws this match (in PvP: X wins – O wins – draws) |
+| **Streak** | Current win streak / all-time best streak for this mode |
+| **Time** | Active (unpaused) time of the current round |
 
-The chosen style is persisted under `tictactoe.iconStyle` in `localStorage`, so refreshing the page keeps your preference. The internal model is unchanged (the marks are still `'X'` and `'O'`); only the rendering swaps.
+Every finished round is recorded once by the kit under `arcade.stats.tictactoe` (`best`, `plays`, `wins`, `totalScore`,
+`totalSeconds`, `lastScore`, `lastPlayedAt`). PvP rounds are recorded as unranked (`ranked: false`, from player 1 = X's side):
+they count as plays but never touch Best or the leaderboard, and `onGameOver` is not called for them.
+Per-mode best streaks keep their pre-kit keys `tictactoe.highScore.<mode>` (a streak, not a score — so it is not migrated into
+arcade stats); the legacy single key `tictactoe.highScore` is still migrated into the Hard record once.
 
-Two visually distinct molar shapes, both inline SVG, both using `currentColor` for the silhouette stroke so the player colours come from CSS variables.
+## 💾 Autosave & resume
 
-| Mark | Icon                  | Player colour token | Default light / dark |
-| ---- | --------------------- | ------------------- | -------------------- |
-| `X`  | 🦷 **Healthy** molar  | `--ttt-x-color`     | `#3b82f6` / `#60a5fa` |
-| `O`  | 🦷 **Decayed** molar (with cavity dot) | `--ttt-o-color` | `#c9a35a` / `#d4a574` |
+The session is the **whole match**, not just the round: board, side to move, mode, starting mark, match scores, current streak and
+points (key `arcade.session.tictactoe`, schema-versioned and checked by a strict validator that also rejects unreachable positions).
+It is saved about once a second, whenever the page is hidden and when the game unmounts — and it is kept **between rounds**, so
+closing the tab after a round never loses your W–L–D or points. Reloading shows **Welcome back** with the match paused
+(*Continue* · *New round* · *New match*); a round that had already finished is not replayed — the match continues with a fresh round.
+Only an explicit action drops it: **Discard** next to the *Autosaved* badge (back to a fresh, idle board), *Reset scores*, or
+changing the mode (a new match).
 
-Both icons share the same outer silhouette, so the board reads as a *grid of teeth* — the difference is the dental state. (The author is a dentist.) The whole game roots at `<div class="ttt-app">` which both defines and consumes these CSS variables, so the portal's tokens override the surrounding page but `.ttt-app` always wins for game-internal rendering.
+## 🧩 Embedding in Arcade-Game-Center
+
+```tsx
+import { TicTacToeGame, TicTacToeDemo } from '@arcade/tictactoe';
+
+<TicTacToeGame
+  embedded                                   // hide the page title; the portal shows it
+  onGameOver={(score) => submitScore('tictactoe', score)}   // ranked rounds with points > 0
+  onRunEnd={(run) => console.log(run.outcome, run.ranked)}  // every round, PvP included
+  onStatusChange={({ status, score, seconds }) => updateHeader(status, seconds)}
+/>
+<TicTacToeDemo active={cardIsVisible} />     // landing-page attract mode
+```
+
+Both components follow the shared `ArcadeGameProps` / `ArcadeDemoProps` contract from `src/arcade/types.ts`.
+
+Status mapping: `idle` before the first round of a visit (Start overlay), `running` while a round is played, `paused` while
+suspended (or restored), `gameOver` from the moment a round ends until the next one starts. `score` is the current round's score
+(0 while playing); `runKey` is a round counter.
+
+## 🧠 How it works
+
+The engine is a single pure reducer, `advanceGame(state, action, { rng })`:
+
+```
+playing ──┬── (winning move) ───────────→ won   ─┐
+          └── (board full, no winner) ───→ draw  ─┴─ newRound → playing (loser opens)
+```
+
+1. **`place`** drops the side-to-move's mark on an empty cell — rejected while it is the AI's turn, on filled cells and after the round ended.
+2. **`aiMove`** asks `bestMove(board, mark, mode, rng)` for the AI's cell. The RNG is injected, so tests are deterministic.
+3. **Win check first**, then draw check — a winning ninth mark is a win, never a draw.
+4. A finished round is **scored** with `duelRoundScore`; points, W–L–D and the streak are updated in the same step.
+5. **`newRound`** clears the board and keeps the match; **`changeMode`** starts a new match; **`resetScores`** zeroes it.
+
+### 🤖 Game modes & AI
+
+| Mode | Player 1 (X) | Player 2 (O) | Winnable? |
+| --- | --- | --- | --- |
+| **PvP** | Human | Human (same device) | Yes, by either player |
+| **Easy** | Human | AI (uniform random) | Yes, almost always |
+| **Medium** | Human | AI (5-step heuristic) | Yes, with effort |
+| **Hard** | Human | AI (full α-β minimax) | **Never.** Best result is a draw |
+
+Medium follows a strict priority: take the win → block the opponent's win → take the centre → a random corner → a random edge.
+Hard runs full minimax with α-β pruning over the 3×3 tree (well under 1 ms per move), scoring `+10 − depth` for a win,
+`depth − 10` for a loss and 0 for a draw — so it prefers shorter wins and longer losses. The test suite proves it never loses by
+walking **every** possible human reply from the empty board, with the human moving first and second.
+
+`useAITurn` schedules the AI move after the chosen delay only while the round is running (not idle, paused or behind the
+reset dialog); the timer is cancelled on every state change and on unmount, so no stale move ever lands.
+
+### 🦷 Tooth icons
+
+| Mark | Icon | Colour |
+| --- | --- | --- |
+| `X` | 🦷 **Healthy** molar | medical blue `#4a8cf0` |
+| `O` | 🦷 **Decayed** molar (with cavity) | aged enamel `#c9933f` |
+
+Both share one inline-SVG silhouette (`currentColor` stroke, ivory fill), so the board reads as a *grid of teeth* — the difference is
+the dental state. (The author is a dentist.) The internal model is always `'X'` / `'O'`; only the rendering swaps.
+
+### 🎬 Demo
+
+`TicTacToeDemo` pits AIs of mixed strength against each other (medium vs easy, easy vs hard, hard vs medium, …) through the real
+`advanceGame`, one move every 400 ms, and restarts 1.2 s after each result — alternating tooth and X/O marks. It has no keyboard
+listeners, no sound, no stats and no storage writes, and freezes when `active` is false.
 
 ## 🧪 Scripts
 
-| Script                | Purpose                                |
-| --------------------- | -------------------------------------- |
-| `npm run dev`         | Start the local dev server (Vite)      |
-| `npm run build`       | Type-check and produce a prod bundle   |
-| `npm run preview`     | Preview the production build           |
-| `npm run typecheck`   | Run `tsc --noEmit`                     |
-| `npm run lint`        | Run ESLint across the project          |
+| Script | Purpose |
+| --- | --- |
+| `npm run dev` | Vite dev server |
+| `npm run build` | Type-check (`tsc -b`) and production build |
+| `npm run preview` | Serve the production build |
+| `npm run typecheck` | `tsc -b` |
+| `npm run lint` | ESLint |
+| `npm test` | Vitest (logic + component tests) |
+| `npm run check` | lint → typecheck → test → build (what CI runs) |
 
 ## 🏗️ Architecture
 
-Logic lives outside presentation. **`src/logic/*` and `src/hooks/*` never import from `components/`** — that's what makes this package drop-in for the [`Arcade-Game-Center`](https://github.com/ZoliQua/Arcade-Game-Center) monorepo.
-
 ```
 src/
-  logic/             pure game rules — no React, no DOM
-    types.ts            Mark, Cell, Board (length-9 tuple), GameState, GameAction
-    constants.ts        WINNING_LINES, AI_DELAY_MS, animation durations
-    grid.ts             index ↔ (row, col), getEmptyCells, isFull, focus movement
-    win.ts              checkWin(board), isDraw(board)
-    ai.ts               easy / medium / hard with α-β pruning; RNG injected
-    game.ts             advanceGame(state, action, ctx) reducer + createInitialState
-  hooks/
-    useKeyboardSelect.ts    arrow/WASD/Enter/R/N/1–4/Esc; preventDefault on arrows
-    useAITurn.ts            cancellable setTimeout dispatching `aiMove`
-    useBestStreak.ts        localStorage-backed best streak, write-on-new-best only
-    useElapsedSeconds.ts    mm:ss round timer; pauses on won / draw
-  components/
-    GameBoard.tsx       3×3 CSS grid + 9 Cell children + WinningLine overlay
-    Cell.tsx            <button> + aria-label + ToothIcon when filled
-    ToothIcon.tsx       SVG tooth, healthy / decayed variants, currentColor stroke
-    WinningLine.tsx     absolutely positioned SVG line, stroke-dashoffset reveal
-    ScoreBoard.tsx      X / O / draws + streak + best + status + timer
-    GameControls.tsx    new round / reset session scores
-    ModeSelect.tsx      PvP / Easy / Medium / Hard segmented control
-    Overlay.tsx         won / draw overlay
-  styles/
-    ttt.css             every selector scoped under .ttt-app
-    page.css            standalone-only chrome (deleted on portal integration)
-  TicTacToeGame.tsx     root for both standalone AND portal; wraps in .ttt-app
-  App.tsx               standalone-only chrome (footer, page title)
-  main.tsx              standalone-only React entry
-  index.ts              library entry — exports { TicTacToeGame }
+  arcade/              vendored Zoltan's Arcade kit — do not edit here (see its README)
+  logic/               pure game rules
+    types.ts constants.ts grid.ts win.ts
+    ai.ts              easy / medium / hard (α-β minimax), RNG injected
+    game.ts            advanceGame reducer, createInitialState, roundOutcome, scoring
+    autopilot.ts       AI-vs-AI driver + seeded RNG for the demo
+    persist.ts         strict runtime validation of saved sessions
+  hooks/               useAITurn, useKeyboardSelect, useBestStreak, useIconStyle, useAIDelay, useSound
+  components/          GameBoard (full + mini), Cell, ToothIcon, WinningLine, ModeSelect, AISpeedToggle,
+                       IconStyleToggle, SoundToggle
+  demo/TicTacToeDemo.tsx  landing-page attract mode
+  TicTacToeGame.tsx    the embeddable game (ArcadeGameProps)
+  App.tsx              standalone page: <ArcadeShell><TicTacToeGame/></ArcadeShell>
+  main.tsx             entry; loads the shared arcade.css once
+  index.ts             package entry used by Arcade-Game-Center
 ```
 
-The dual-root layout (`TicTacToeGame.tsx` + `App.tsx` + `index.ts`) means **zero refactoring** when this game is moved into the [`Arcade-Game-Center`](https://github.com/ZoliQua/Arcade-Game-Center) monorepo — the portal renders `<TicTacToeGame />` directly inside its shell.
+## 🤝 Contributing
 
-## 🧩 Sister projects
-
-- 🐍 [Snake-Game](https://github.com/ZoliQua/Snake-Game)
-- 🟦 [Tetris-Game](https://github.com/ZoliQua/Tetris-Game)
-- 🔢 [2048-Game](https://github.com/ZoliQua/2048-Game)
-- 🕹️ [Arcade-Game-Center](https://github.com/ZoliQua/Arcade-Game-Center) — the portal that hosts them all
+See [CONTRIBUTING.md](./CONTRIBUTING.md), the [Code of Conduct](./CODE_OF_CONDUCT.md) and [SECURITY.md](./SECURITY.md).
+Contributors are listed in [CONTRIBUTORS.md](./CONTRIBUTORS.md); changes in [CHANGELOG.md](./CHANGELOG.md).
+The original v1 design notes live in [GAME-PLAN.md](./GAME-PLAN.md).
 
 ## ⚖️ License
 
-Released under the [MIT License](./LICENSE). © 2026 Zoltan Dul.
+[MIT](./LICENSE) © 2026 Zoltán Dul
 
 ---
 
-<p align="center">Made with 🦷 by Zoltan Dul</p>
+<p align="center">Made with 🦷 by Zoltán Dul · part of <a href="https://github.com/ZoliQua/Arcade-Game-Center">Zoltan's Arcade</a></p>
