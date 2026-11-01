@@ -1,7 +1,7 @@
 # 🦷 Tic-Tac-Toe — Tooth Edition
 
 A minimal, type-safe Tic-Tac-Toe with **dental tooth icons** (or classic X / O) built with **React 18**, **Vite** and **TypeScript** — keyboard-first, grid-based DOM, no canvas, no game engine.
-Runs on its own **and** as one of the nine games of **[Zoltan's Arcade](https://github.com/ZoliQua/Arcade-Game-Center)**.
+Runs on its own **and** as one of the ten games of **[Zoltan's Arcade](https://github.com/ZoliQua/Arcade-Game-Center)**.
 
 [![CI](https://github.com/ZoliQua/Tic-Tac-Toe-Game/actions/workflows/ci.yml/badge.svg)](https://github.com/ZoliQua/Tic-Tac-Toe-Game/actions/workflows/ci.yml)
 ![license](https://img.shields.io/badge/license-MIT-green)
@@ -43,6 +43,7 @@ Every game is a standalone repo that also plugs into the portal. They share one 
 | 🏓 Breakout | [Breakout-Game](https://github.com/ZoliQua/Breakout-Game) | Paddle |
 | 👾 Space Invaders | [Space-Invaders-Game](https://github.com/ZoliQua/Space-Invaders-Game) | Shooter |
 | 🔴 Connect Four | [Connect-Four-Game](https://github.com/ZoliQua/Connect-Four-Game) | Duel |
+| 🔩 Nut Sort | [Nut-Sort-Game](https://github.com/ZoliQua/Nut-Sort-Game) | Sorting |
 
 ## ✨ Features
 
