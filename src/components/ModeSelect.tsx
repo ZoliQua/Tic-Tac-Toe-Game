@@ -1,3 +1,5 @@
+import { useMessages } from '../arcade';
+import { MESSAGES, MODE_KEY, type TicTacToeMessageKey } from '../i18n';
 import type { Mode } from '../logic/types';
 
 export type ModeSelectProps = {
@@ -5,21 +7,24 @@ export type ModeSelectProps = {
   onChange: (mode: Mode) => void;
 };
 
-const MODES: ReadonlyArray<{ id: Mode; label: string; hint: string }> = [
-  { id: 'pvp', label: 'PvP', hint: 'Two players on one device (key 1)' },
-  { id: 'easy', label: 'Easy', hint: 'Random AI (key 2)' },
-  { id: 'medium', label: 'Medium', hint: 'Heuristic AI (key 3)' },
-  { id: 'hard', label: 'Hard', hint: 'Minimax AI — never loses (key 4)' },
+const MODES: ReadonlyArray<{ id: Mode; hint: TicTacToeMessageKey }> = [
+  { id: 'pvp', hint: 'hintPvp' },
+  { id: 'easy', hint: 'hintEasy' },
+  { id: 'medium', hint: 'hintMedium' },
+  { id: 'hard', hint: 'hintHard' },
 ];
 
-export const ModeSelect = ({ mode, onChange }: ModeSelectProps) => (
-  <div className="arc-segmented arc-segmented--full" role="group" aria-label="Game mode">
-    {MODES.map(({ id, label, hint }) => (
-      <button type="button" key={id} aria-pressed={id === mode} title={hint} onClick={() => onChange(id)}>
-        {label}
-      </button>
-    ))}
-  </div>
-);
+export const ModeSelect = ({ mode, onChange }: ModeSelectProps) => {
+  const t = useMessages(MESSAGES);
+  return (
+    <div className="arc-segmented arc-segmented--full" role="group" aria-label={t('modeGroup')}>
+      {MODES.map(({ id, hint }) => (
+        <button type="button" key={id} aria-pressed={id === mode} title={t(hint)} onClick={() => onChange(id)}>
+          {t(MODE_KEY[id])}
+        </button>
+      ))}
+    </div>
+  );
+};
 
 export default ModeSelect;

@@ -1,5 +1,7 @@
 import { memo } from 'react';
+import { useMessages } from '../arcade';
 import type { IconStyle } from '../hooks/useIconStyle';
+import { MESSAGES, type TicTacToeMessageKey } from '../i18n';
 import type { Cell as CellValue } from '../logic/types';
 import { ToothIcon } from './ToothIcon';
 import styles from './GameBoard.module.css';
@@ -17,14 +19,17 @@ export type CellProps = {
   mini?: boolean;
 };
 
-const ariaForValue = (index: number, value: CellValue, iconStyle: IconStyle): string => {
+const ariaForValue = (
+  index: number,
+  value: CellValue,
+  iconStyle: IconStyle,
+  t: (key: TicTacToeMessageKey, vars?: Record<string, string | number>) => string,
+): string => {
   const row = Math.floor(index / 3) + 1;
   const col = (index % 3) + 1;
-  if (value === null) return `Row ${row}, column ${col}, empty`;
-  if (iconStyle === 'classic') return `Row ${row}, column ${col}, ${value}`;
-  return value === 'X'
-    ? `Row ${row}, column ${col}, healthy tooth`
-    : `Row ${row}, column ${col}, decayed tooth`;
+  if (value === null) return t('cellEmpty', { row, col });
+  if (iconStyle === 'classic') return t('cellMark', { row, col, mark: value });
+  return t('cellMark', { row, col, mark: t(value === 'X' ? 'cellHealthy' : 'cellDecayed') });
 };
 
 const Mark = ({ value, iconStyle }: { value: 'X' | 'O'; iconStyle: IconStyle }) =>
@@ -49,6 +54,7 @@ export const Cell = memo(function Cell({
   onFocusCell,
   mini = false,
 }: CellProps) {
+  const t = useMessages(MESSAGES);
   const className = [
     styles.cell,
     value === 'X' ? styles.x : value === 'O' ? styles.o : styles.empty,
@@ -68,7 +74,7 @@ export const Cell = memo(function Cell({
       type="button"
       role="gridcell"
       className={className}
-      aria-label={ariaForValue(index, value, iconStyle)}
+      aria-label={ariaForValue(index, value, iconStyle, t)}
       aria-disabled={!isInteractive || value !== null}
       onClick={() => {
         if (isInteractive) onSelect(index);

@@ -1,5 +1,7 @@
 import { memo } from 'react';
+import { useMessages } from '../arcade';
 import type { IconStyle } from '../hooks/useIconStyle';
+import { MESSAGES } from '../i18n';
 import type { Board, WinningLine as Line } from '../logic/types';
 import { Cell } from './Cell';
 import { WinningLine } from './WinningLine';
@@ -34,12 +36,13 @@ export const GameBoard = memo(function GameBoard({
   variant = 'full',
 }: GameBoardProps) {
   const mini = variant === 'mini';
+  const t = useMessages(MESSAGES);
   return (
     <div
       className={[styles.board, mini ? styles.mini : '', draw ? styles.draw : ''].filter(Boolean).join(' ')}
       data-icon-style={iconStyle}
       role={mini ? undefined : 'grid'}
-      aria-label={mini ? undefined : 'Tic-Tac-Toe board'}
+      aria-label={mini ? undefined : t('board')}
       aria-hidden={mini ? true : undefined}
     >
       {board.map((value, index) => (

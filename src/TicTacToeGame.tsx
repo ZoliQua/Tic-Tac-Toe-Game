@@ -3,11 +3,16 @@ import {
   clearSession,
   DUEL_BASE_POINTS,
   formatClock,
+  formatNumber,
+  gameName,
   GameOverlay,
   KeyHelp,
   SaveBadge,
   StatPanel,
   useArcadeRun,
+  useKitMessages,
+  useLang,
+  useMessages,
   useRestoredSession,
   useRunTimer,
   useSessionAutosave,
@@ -15,6 +20,7 @@ import {
   type ArcadeStatus,
   type OverlayAction,
 } from './arcade';
+import { MESSAGES, MODE_KEY, type TicTacToeMessageKey } from './i18n';
 import { AISpeedToggle } from './components/AISpeedToggle';
 import { GameBoard } from './components/GameBoard';
 import { IconStyleToggle } from './components/IconStyleToggle';
@@ -45,19 +51,21 @@ export const RESULT_DELAY_MS = 900;
  */
 type Phase = 'idle' | 'live' | 'paused';
 
-const KEYS: [string, string][] = [
-  ['← ↑ → ↓', 'Move cursor (or WASD)'],
-  ['Enter Space', 'Place · start · next round'],
-  ['P Esc', 'Pause / resume'],
-  ['R', 'New round'],
-  ['N 1–4', 'Cycle / pick mode'],
-  ['I', 'Teeth ↔ X/O marks'],
-  ['C', 'Reset match scores'],
+type T = (key: TicTacToeMessageKey, vars?: Record<string, string | number>) => string;
+
+const keyRows = (t: T): [string, string][] => [
+  ['← ↑ → ↓', t('keyMove')],
+  [`Enter ${t('kbdSpace')}`, t('keyPlace')],
+  ['P Esc', t('keyPause')],
+  ['R', t('keyNewRound')],
+  ['N 1–4', t('keyMode')],
+  ['I', t('keyIcons')],
+  ['C', t('keyReset')],
 ];
 
-const markName = (mark: Mark, iconStyle: IconStyle): string => {
+const markName = (mark: Mark, iconStyle: IconStyle, t: T): string => {
   if (iconStyle === 'classic') return mark;
-  return mark === 'X' ? 'Healthy tooth' : 'Decayed tooth';
+  return t(mark === 'X' ? 'healthyTooth' : 'decayedTooth');
 };
 
 // Best streaks are all-time records with their own storage, not session data.
@@ -71,6 +79,10 @@ const reducer = (state: GameState, action: GameAction): GameState =>
 
 export function TicTacToeGame(props: ArcadeGameProps = {}) {
   const { embedded = false } = props;
+  const t = useMessages(MESSAGES);
+  const k = useKitMessages();
+  const [lang] = useLang();
+  const num = (n: number) => formatNumber(n, lang);
   const restored = useRestoredSession<SavedGame>('tictactoe', SESSION_SCHEMA, isTicTacToeSession);
   // A restored round that was still being played resumes exactly; a finished
   // one is not replayed (it is already recorded) — the match goes on with a new round.
@@ -261,61 +273,62 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
 
   let turnLabel: string | undefined;
   if (status === 'running') {
-    if (aiMark === null) turnLabel = `${markName(state.current, iconStyle)} to move`;
-    else turnLabel = state.current === aiMark ? 'AI thinking…' : 'Your turn';
+    if (aiMark === null) turnLabel = t('toMove', { mark: markName(state.current, iconStyle, t) });
+    else turnLabel = t(state.current === aiMark ? 'aiThinking' : 'yourTurn');
   }
 
   let overlay: { title: string; message: string; actions: OverlayAction[] } | null = null;
   if (confirmOpen) {
     overlay = {
-      title: 'Reset match scores?',
-      message: 'This clears wins, losses, draws, points and your current streak. Best streaks and arcade stats stay.',
+      title: t('resetTitle'),
+      message: t('resetBody'),
       actions: [
-        { label: 'Reset scores', onClick: confirmReset, primary: true, kbd: 'Enter' },
-        { label: 'Keep', onClick: cancelReset, kbd: 'Esc' },
+        { label: t('resetScores'), onClick: confirmReset, primary: true, kbd: 'Enter' },
+        { label: t('keep'), onClick: cancelReset, kbd: 'Esc' },
       ],
     };
   } else if (status === 'idle') {
     overlay = {
-      title: 'Tic-Tac-Toe',
-      message:
-        state.mode === 'pvp'
-          ? 'Two players, one board: get three in a row. PvP rounds are just for fun (unranked).'
-          : 'Three in a row beats the AI. Faster wins and harder AIs score more points.',
-      actions: [{ label: 'Start', onClick: start, primary: true, kbd: 'Space' }],
+      title: gameName('tictactoe', lang),
+      message: t(state.mode === 'pvp' ? 'idlePvp' : 'idleDuel'),
+      actions: [{ label: k('start'), onClick: start, primary: true, kbd: t('kbdSpace') }],
     };
   } else if (status === 'paused') {
     overlay = welcomeBack
       ? {
-          title: 'Welcome back',
-          message: `Your ${state.mode === 'pvp' ? 'PvP' : state.mode} match was restored — ${state.points} points, ${humanWins}–${aiWins}–${state.scores.draws}.`,
+          title: k('welcomeBack'),
+          message: t('welcomeBody', {
+            mode: t(MODE_KEY[state.mode]),
+            points: num(state.points),
+            record: `${num(humanWins)}–${num(aiWins)}–${num(state.scores.draws)}`,
+          }),
           actions: [
-            { label: 'Continue', onClick: togglePause, primary: true, kbd: 'P' },
-            { label: 'New round', onClick: newRound, kbd: 'R' },
-            { label: 'New match', onClick: newMatch },
+            { label: t('continue'), onClick: togglePause, primary: true, kbd: 'P' },
+            { label: t('newRound'), onClick: newRound, kbd: 'R' },
+            { label: t('newMatch'), onClick: newMatch },
           ],
         }
       : {
-          title: 'Paused',
-          message: 'Your match is autosaved — you can close the tab and continue later.',
+          title: k('paused'),
+          message: t('pausedBody'),
           actions: [
-            { label: 'Resume', onClick: togglePause, primary: true, kbd: 'P' },
-            { label: 'New round', onClick: newRound, kbd: 'R' },
+            { label: k('resume'), onClick: togglePause, primary: true, kbd: 'P' },
+            { label: t('newRound'), onClick: newRound, kbd: 'R' },
           ],
         };
   } else if (status === 'gameOver' && showResult) {
     const outcome = roundOutcome(state);
     let title: string;
-    if (outcome === 'draw') title = "It's a draw";
-    else if (aiMark === null) title = `${markName(state.winner as Mark, iconStyle)} wins!`;
-    else title = outcome === 'win' ? 'You win!' : 'The AI wins';
+    if (outcome === 'draw') title = t('draw');
+    else if (aiMark === null) title = t('markWins', { mark: markName(state.winner as Mark, iconStyle, t) });
+    else title = t(outcome === 'win' ? 'youWin' : 'aiWins');
     const message = ranked
-      ? `+${state.roundScore} points · Match ${state.points} · Best ${best}${newBest ? ' — new best!' : ''}`
-      : 'PvP rounds are unranked. Loser opens the next round.';
+      ? t(newBest ? 'roundNewBest' : 'roundRanked', { round: num(state.roundScore), points: num(state.points), best: num(best) })
+      : t('roundPvp');
     overlay = {
       title,
       message,
-      actions: [{ label: 'Next round', onClick: newRound, primary: true, kbd: 'R' }],
+      actions: [{ label: t('nextRound'), onClick: newRound, primary: true, kbd: 'R' }],
     };
   }
 
@@ -327,11 +340,9 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
       {!embedded && (
         <header className="arc-game__head">
           <div>
-            <h1 className="arc-game__title">{iconStyle === 'classic' ? 'Tic-Tac-Toe' : 'Tooth Tac Toe'}</h1>
+            <h1 className="arc-game__title">{iconStyle === 'classic' ? gameName('tictactoe', lang) : t('titleTooth')}</h1>
             <p className="arc-game__sub">
-              {iconStyle === 'classic'
-                ? 'Classic X / O — the hard AI never loses.'
-                : 'Healthy vs decayed — the hard AI never loses.'}
+              {t(iconStyle === 'classic' ? 'subClassic' : 'subTooth')}
             </p>
           </div>
         </header>
@@ -341,22 +352,22 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
         status={status}
         statusLabel={turnLabel}
         items={[
-          { label: 'Points', value: state.points },
-          { label: 'Best', value: best, highlight: newBest },
+          { label: t('points'), value: num(state.points) },
+          { label: k('best'), value: num(best), highlight: newBest },
           {
-            label: aiMark === null ? 'X–O–D' : 'W–L–D',
-            value: `${humanWins}–${aiWins}–${state.scores.draws}`,
+            label: t(aiMark === null ? 'tallyPvp' : 'tallyDuel'),
+            value: `${num(humanWins)}–${num(aiWins)}–${num(state.scores.draws)}`,
           },
           {
-            label: 'Streak',
+            label: t('streak'),
             value: (
               <>
-                {state.currentStreak}
-                <small className={styles.sub}> / {bestStreak}</small>
+                {num(state.currentStreak)}
+                <small className={styles.sub}> / {num(bestStreak)}</small>
               </>
             ),
           },
-          { label: 'Time', value: formatClock(seconds) },
+          { label: k('time'), value: formatClock(seconds) },
         ]}
       />
 
@@ -377,17 +388,23 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
 
         <aside className={styles.side}>
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Game</h2>
+            <h2 className="arc-panel__title">{t('panelGame')}</h2>
             <div className={styles.buttons}>
               <button
                 type="button"
                 className="arc-btn arc-btn--primary"
                 onClick={status === 'running' || status === 'paused' ? togglePause : primary}
               >
-                {status === 'running' ? 'Pause' : status === 'paused' ? 'Resume' : status === 'idle' ? 'Start' : 'Next round'}
+                {status === 'running'
+                  ? k('pause')
+                  : status === 'paused'
+                    ? k('resume')
+                    : status === 'idle'
+                      ? k('start')
+                      : t('nextRound')}
               </button>
               <button type="button" className="arc-btn" onClick={newRound} disabled={status === 'idle'}>
-                New round
+                {t('newRound')}
               </button>
             </div>
             <button
@@ -395,7 +412,7 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
               className={`arc-btn arc-btn--ghost ${styles.reset}`}
               onClick={() => requestReset(false)}
             >
-              Reset scores <kbd className="arc-kbd">C</kbd>
+              {t('resetScores')} <kbd className="arc-kbd">C</kbd>
             </button>
             <div className={styles.save}>
               <SaveBadge savedAt={phase !== 'idle' ? savedAt : null} onDiscard={discardSave} />
@@ -403,17 +420,17 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
           </section>
 
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Mode</h2>
+            <h2 className="arc-panel__title">{t('panelMode')}</h2>
             <ModeSelect mode={state.mode} onChange={changeMode} />
             <p className={styles.note}>
               {state.mode === 'pvp'
-                ? 'Two players on one device. Unranked — rounds count as plays only.'
-                : `Ranked: a win pays ${DUEL_BASE_POINTS[state.mode]}–${DUEL_BASE_POINTS[state.mode] * 2} (faster wins pay more), a draw a quarter. Changing mode starts a new match.`}
+                ? t('notePvp')
+                : t('noteRanked', { min: num(DUEL_BASE_POINTS[state.mode]), max: num(DUEL_BASE_POINTS[state.mode] * 2) })}
             </p>
           </section>
 
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Settings</h2>
+            <h2 className="arc-panel__title">{t('panelSettings')}</h2>
             <div className={styles.settings}>
               <IconStyleToggle style={iconStyle} onChange={setIconStyle} />
               <AISpeedToggle speed={aiSpeed} onChange={setAISpeed} />
@@ -422,8 +439,8 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
           </section>
 
           <section className="arc-panel">
-            <h2 className="arc-panel__title">Keys</h2>
-            <KeyHelp rows={KEYS} />
+            <h2 className="arc-panel__title">{t('panelKeys')}</h2>
+            <KeyHelp rows={keyRows(t)} />
           </section>
         </aside>
       </div>
