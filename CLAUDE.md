@@ -17,7 +17,7 @@
   * `npm test` — Vitest (logic + component tests, jsdom)
   * `npm run check` — lint → typecheck → test → build (same as CI)
 * **Board**: fixed 3 × 3 (`Board = readonly [Cell × 9]`, length-9 tuple).
-* **Marks**: internally `'X'` / `'O'`. Rendered as tooth icons (healthy = X, decayed = O) or, with the **I** toggle, classic X / O glyphs.
+* **Marks**: internally `'X'` / `'O'`. Rendered as classic X / O glyphs, or — while the shared dental mode (`arcade.dental`, default off; **I** / Settings toggles it) is on — as tooth icons (healthy = X, chipped decayed = O).
 * **Modes**: `'pvp'`, `'easy'` (random AI), `'medium'` (heuristic AI), `'hard'` (α-β minimax — never loses). Human is always X (`humanMark`).
 * **Win**: any of 8 lines; win check runs **before** draw check. **Draw**: full board, no win.
 * **Scoring**: each round is one arcade run, scored with the kit's `duelRoundScore({ outcome, difficulty: mode | null, moves: moveCount, boardCells: 9 })`
@@ -26,7 +26,7 @@
 * **Stats**: kept by the kit (`arcade.stats.tictactoe`); Best = `stats.best`. There is no game-owned high-score storage.
 * **Best streaks**: per mode, all-time, `localStorage` keys `tictactoe.highScore.<mode>` (legacy name kept for existing records; it is a streak, deliberately not the kit's `legacyBestKey`). The old single key `tictactoe.highScore` is migrated into Hard once.
 * **Session**: the whole match (`SavedGame` = `GameState` minus `bestStreaks`) under `arcade.session.tictactoe`, schema `SESSION_SCHEMA = 1`, validated by `isTicTacToeSession`. Kept between rounds; dropped only by Discard (→ idle), reset by *Reset scores* / mode change.
-* **Other prefs**: `tictactoe.iconStyle`, `tictactoe.aiSpeed`, `tictactoe.soundEnabled`.
+* **Other prefs**: `tictactoe.aiSpeed`, `tictactoe.soundEnabled`. The old `tictactoe.iconStyle` key is migrated once by `useIconStyle` (`'tooth'` → `applyDental(true)` if dental mode was never set) and removed.
 * **No game loop**: state advances only on input and on the AI's delayed dispatch.
 * **Rendering**: DOM grid + inline SVG (tooth icons, winning strike). No canvas.
 * **Communication**: respond to the user in **Hungarian** in chat, even though this file and the codebase are in English.
@@ -57,7 +57,7 @@ src/
     *.test.ts
   hooks/               # useAITurn, useKeyboardSelect, useBestStreak, useIconStyle, useAIDelay, useSound
   components/          # GameBoard (full + mini) + GameBoard.module.css, Cell, ToothIcon, WinningLine,
-                       # ModeSelect, AISpeedToggle, IconStyleToggle, SoundToggle
+                       # ModeSelect, AISpeedToggle, DentalToggle, SoundToggle
   demo/TicTacToeDemo.tsx
   TicTacToeGame.tsx    # embeddable game, ArcadeGameProps; App.module.css for its layout
   TicTacToeGame.test.tsx
@@ -96,7 +96,7 @@ A restored round that had already finished is not replayed — `newRound` is app
 * **Mouse / touch**: cells are `<button role="gridcell">`; a click places only while running and on the human's turn.
 * **Keyboard** (`useKeyboardSelect`): one window listener per mount (handlers via ref); starts with `shouldIgnoreKey`.
   Arrows/WASD cursor · Enter/Space place / start / resume / next round · **P/Esc** pause · **R** new round · **N** / **1–4** mode ·
-  **I** icon style · **C** reset scores (confirm overlay: Enter confirms, Esc keeps; **Shift+C** skips it). **T** is reserved for the theme.
+  **I** dental mode (teeth ↔ X/O) · **C** reset scores (confirm overlay: Enter confirms, Esc keeps; **Shift+C** skips it). **T** is reserved for the theme.
 * **AI** (`useAITurn`): schedules `aiMove` after the AI delay only while running and no dialog is open; cancelled on every change and on unmount.
 * `place` is rejected by the reducer on the AI's turn, so no input path can play the AI's mark.
 

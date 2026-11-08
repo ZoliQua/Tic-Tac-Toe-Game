@@ -38,7 +38,12 @@ const Mark = ({ value, iconStyle }: { value: 'X' | 'O'; iconStyle: IconStyle }) 
       {value}
     </span>
   ) : (
-    <span className={styles.icon} aria-hidden="true">
+    <span
+      className={styles.icon}
+      aria-hidden="true"
+      data-testid="tictactoe-mark-tooth"
+      data-shape={value === 'X' ? 'healthy' : 'decayed'}
+    >
       <ToothIcon variant={value === 'X' ? 'healthy' : 'decayed'} />
     </span>
   );

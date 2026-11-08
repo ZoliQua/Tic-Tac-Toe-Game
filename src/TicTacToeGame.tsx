@@ -23,7 +23,7 @@ import {
 import { MESSAGES, MODE_KEY, type TicTacToeMessageKey } from './i18n';
 import { AISpeedToggle } from './components/AISpeedToggle';
 import { GameBoard } from './components/GameBoard';
-import { IconStyleToggle } from './components/IconStyleToggle';
+import { DentalToggle } from './components/DentalToggle';
 import { ModeSelect } from './components/ModeSelect';
 import { SoundToggle } from './components/SoundToggle';
 import { useAIDelay } from './hooks/useAIDelay';
@@ -101,7 +101,7 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [showResult, setShowResult] = useState(false);
 
-  const { style: iconStyle, setStyle: setIconStyle, toggle: toggleIconStyle } = useIconStyle();
+  const { style: iconStyle, toggle: toggleIconStyle } = useIconStyle();
   const { speed: aiSpeed, delayMs: aiDelay, setSpeed: setAISpeed } = useAIDelay();
   const sound = useSound();
   useBestStreaks(state.bestStreaks);
@@ -432,7 +432,7 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
           <section className="arc-panel">
             <h2 className="arc-panel__title">{t('panelSettings')}</h2>
             <div className={styles.settings}>
-              <IconStyleToggle style={iconStyle} onChange={setIconStyle} />
+              <DentalToggle enabled={iconStyle === 'tooth'} onToggle={toggleIconStyle} />
               <AISpeedToggle speed={aiSpeed} onChange={setAISpeed} />
               <SoundToggle enabled={sound.enabled} onToggle={sound.toggle} />
             </div>

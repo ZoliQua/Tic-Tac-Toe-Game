@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { applyLang, formatNumber, LANGS, loadSession, saveSession } from './arcade';
+import { applyDental, applyLang, formatNumber, LANGS, loadSession, saveSession } from './arcade';
 import { MESSAGES } from './i18n';
 import { createInitialState } from './logic/game';
 import type { SavedGame } from './logic/types';
@@ -55,6 +55,7 @@ describe('<TicTacToeGame /> in other languages', () => {
   });
 
   it('switching to Hungarian mid-round keeps the board and the run', () => {
+    applyDental(true, { silent: true }); // tooth marks (dental mode is off by default)
     render(<TicTacToeGame />);
     act(() => key('1')); // PvP
     act(() => key(' ')); // start

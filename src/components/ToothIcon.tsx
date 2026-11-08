@@ -13,6 +13,12 @@ export type ToothIconProps = {
 const TOOTH_PATH =
   'M30 14c-9 0-16 7-16 17 0 7 2 12 4 18 2 5 4 13 5 22 1 8 4 13 8 13 4 0 6-3 7-10 1-7 2-11 5-11 3 0 4 4 5 11 1 7 3 10 7 10 4 0 7-5 8-13 1-9 3-17 5-22 2-6 4-11 4-18 0-10-7-17-16-17-5 0-9 2-12 5-3-3-7-5-12-5z';
 
+/** The decayed tooth also has a chipped, zig-zag crown edge (the kit's
+ *  `DecayedTooth` outline), so the two players differ by silhouette, not only
+ *  by the cavity marks. */
+const CHIPPED_TOOTH_PATH =
+  'M30 14c-9 0-16 7-16 17 0 7 2 12 4 18 2 5 4 13 5 22 1 8 4 13 8 13 4 0 6-3 7-10 1-7 2-11 5-11 3 0 4 4 5 11 1 7 3 10 7 10 4 0 7-5 8-13 1-9 3-17 5-22 2-6 4-11 4-18l-13-2 7-6-9-4-1-5c-5 0-9 2-12 5-3-3-7-5-12-5z';
+
 export const ToothIcon = ({
   variant,
   size = '100%',
@@ -33,7 +39,7 @@ export const ToothIcon = ({
       focusable="false"
     >
       <path
-        d={TOOTH_PATH}
+        d={variant === 'decayed' ? CHIPPED_TOOTH_PATH : TOOTH_PATH}
         fill="var(--ttt-tooth-fill)"
         stroke="currentColor"
         strokeWidth="3.5"

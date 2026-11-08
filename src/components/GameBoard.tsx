@@ -41,6 +41,7 @@ export const GameBoard = memo(function GameBoard({
     <div
       className={[styles.board, mini ? styles.mini : '', draw ? styles.draw : ''].filter(Boolean).join(' ')}
       data-icon-style={iconStyle}
+      data-dental={iconStyle === 'tooth' ? 'true' : 'false'}
       role={mini ? undefined : 'grid'}
       aria-label={mini ? undefined : t('board')}
       aria-hidden={mini ? true : undefined}

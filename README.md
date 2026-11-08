@@ -48,7 +48,7 @@ Every game is a standalone repo that also plugs into the portal. They share one 
 
 ## ✨ Features
 
-- 🦷 **Dental theme** — `Healthy` (X) vs `Decayed` (O) tooth icons, with a toggle (or **I**) to classic `X` / `O`; the choice is remembered
+- 🦷 **Dental mode** — `Healthy` (X) vs chipped `Decayed` (O) tooth icons, driven by the arcade-wide **Dental mode** (`arcade.dental`, off by default: classic `X` / `O`); switch it in Settings, the arcade top bar or with **I**. An old `tictactoe.iconStyle = 'tooth'` choice is migrated once (only if dental mode was never set) and the old key removed
 - 🎮 **Four modes** — Player-vs-Player, Easy (random AI), Medium (heuristic AI), Hard (α-β minimax — **never loses**)
 - 🏆 **Unified arcade scoring** — every round is scored with the shared duel formula; best score, plays and wins are shared with the portal
 - 🔥 **Per-mode best streaks** — PvP / Easy / Medium / Hard each keep their own all-time win-streak record
@@ -229,7 +229,7 @@ src/
     persist.ts         strict runtime validation of saved sessions
   hooks/               useAITurn, useKeyboardSelect, useBestStreak, useIconStyle, useAIDelay, useSound
   components/          GameBoard (full + mini), Cell, ToothIcon, WinningLine, ModeSelect, AISpeedToggle,
-                       IconStyleToggle, SoundToggle
+                       DentalToggle, SoundToggle
   demo/TicTacToeDemo.tsx  landing-page attract mode
   TicTacToeGame.tsx    the embeddable game (ArcadeGameProps)
   App.tsx              standalone page: <ArcadeShell><TicTacToeGame/></ArcadeShell>

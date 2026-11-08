@@ -143,9 +143,9 @@ describe('<TicTacToeGame />', () => {
     // Opens in Medium; the '4' typed into the field must not switch to Hard.
     expect(screen.getByRole('button', { name: 'Medium' }).getAttribute('aria-pressed')).toBe('true');
     act(() => key('t'));
-    expect(localStorage.getItem('tictactoe.iconStyle')).toBeNull();
-    act(() => key('i'));
-    expect(localStorage.getItem('tictactoe.iconStyle')).toBe('classic');
+    expect(localStorage.getItem('arcade.dental')).toBeNull();
+    act(() => key('i')); // I toggles the shared dental mode (teeth ↔ X/O)
+    expect(localStorage.getItem('arcade.dental')).toBe('1');
   });
 });
 

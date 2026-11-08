@@ -15,7 +15,7 @@ export type TicTacToeMessageKey =
   | 'noteRanked' | 'notePvp'
   | 'modeGroup' | 'modePvp' | 'modeEasy' | 'modeMedium' | 'modeHard'
   | 'hintPvp' | 'hintEasy' | 'hintMedium' | 'hintHard'
-  | 'marks' | 'iconStyle' | 'teeth' | 'classic' | 'teethHint' | 'classicHint'
+  | 'dentalHint'
   | 'aiDelay' | 'speedInstant' | 'speedFast' | 'speedNormal' | 'speedSlow'
   | 'sound'
   | 'board' | 'cellEmpty' | 'cellMark' | 'cellHealthy' | 'cellDecayed'
@@ -70,12 +70,7 @@ export const MESSAGES: Messages<TicTacToeMessageKey> = {
     hintEasy: 'Random AI (key 2)',
     hintMedium: 'Heuristic AI (key 3)',
     hintHard: 'Minimax AI — never loses (key 4)',
-    marks: 'Marks',
-    iconStyle: 'Icon style',
-    teeth: 'Teeth',
-    classic: 'Classic',
-    teethHint: 'Healthy / decayed tooth (key I)',
-    classicHint: 'X / O (key I)',
+    dentalHint: 'X and O become teeth: X a healthy tooth, O a chipped, decayed one (key I)',
     aiDelay: 'AI delay',
     speedInstant: 'Instant',
     speedFast: 'Fast (150 ms)',
@@ -93,7 +88,7 @@ export const MESSAGES: Messages<TicTacToeMessageKey> = {
     keyPause: 'Pause / resume',
     keyNewRound: 'New round',
     keyMode: 'Cycle / pick mode',
-    keyIcons: 'Teeth ↔ X/O marks',
+    keyIcons: 'Dental mode (teeth ↔ X/O marks)',
     keyReset: 'Reset match scores',
   },
   hu: {
@@ -143,12 +138,7 @@ export const MESSAGES: Messages<TicTacToeMessageKey> = {
     hintEasy: 'Véletlenszerű gép (2-es gomb)',
     hintMedium: 'Heurisztikus gép (3-as gomb)',
     hintHard: 'Minimax gép — sosem veszít (4-es gomb)',
-    marks: 'Jelek',
-    iconStyle: 'Ikonstílus',
-    teeth: 'Fogak',
-    classic: 'Klasszikus',
-    teethHint: 'Egészséges / szuvas fog (I gomb)',
-    classicHint: 'X / O (I gomb)',
+    dentalHint: 'Az X és az O fog lesz: X egészséges, O csorba, szuvas fog (I gomb)',
     aiDelay: 'Gép késleltetése',
     speedInstant: 'Azonnali',
     speedFast: 'Gyors (150 ms)',
@@ -166,7 +156,7 @@ export const MESSAGES: Messages<TicTacToeMessageKey> = {
     keyPause: 'Szünet / folytatás',
     keyNewRound: 'Új kör',
     keyMode: 'Mód léptetése / választása',
-    keyIcons: 'Fogak ↔ X/O jelek',
+    keyIcons: 'Fogas mód (fogak ↔ X/O jelek)',
     keyReset: 'Meccs eredményének nullázása',
   },
   de: {
@@ -216,12 +206,7 @@ export const MESSAGES: Messages<TicTacToeMessageKey> = {
     hintEasy: 'Zufalls-KI (Taste 2)',
     hintMedium: 'Heuristische KI (Taste 3)',
     hintHard: 'Minimax-KI — verliert nie (Taste 4)',
-    marks: 'Symbole',
-    iconStyle: 'Symbolstil',
-    teeth: 'Zähne',
-    classic: 'Klassisch',
-    teethHint: 'Gesunder / kariöser Zahn (Taste I)',
-    classicHint: 'X / O (Taste I)',
+    dentalHint: 'X und O werden zu Zähnen: X ein gesunder, O ein abgebrochener, kariöser Zahn (Taste I)',
     aiDelay: 'KI-Verzögerung',
     speedInstant: 'Sofort',
     speedFast: 'Schnell (150 ms)',
@@ -239,7 +224,7 @@ export const MESSAGES: Messages<TicTacToeMessageKey> = {
     keyPause: 'Pause / weiter',
     keyNewRound: 'Neue Runde',
     keyMode: 'Modus wechseln / wählen',
-    keyIcons: 'Zähne ↔ X/O-Symbole',
+    keyIcons: 'Zahnmodus (Zähne ↔ X/O-Symbole)',
     keyReset: 'Spielstand zurücksetzen',
   },
 };

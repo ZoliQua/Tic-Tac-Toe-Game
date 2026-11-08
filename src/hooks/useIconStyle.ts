@@ -1,48 +1,44 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { applyDental, DENTAL_KEY, readDental, readString, removeKey, useDental } from '../arcade';
 
+/** Mark artwork: tooth icons while the shared dental mode is on, classic X / O otherwise. */
 export type IconStyle = 'tooth' | 'classic';
 
-const STORAGE_KEY = 'tictactoe.iconStyle';
+/** The old per-game mark-style key (`'tooth' | 'classic'`), replaced by `arcade.dental`. */
+export const LEGACY_ICON_STYLE_KEY = 'tictactoe.iconStyle';
 
-const read = (): IconStyle => {
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    return raw === 'classic' ? 'classic' : 'tooth';
-  } catch {
-    return 'tooth';
-  }
+/**
+ * One-time migration of the old per-game setting: a saved `'tooth'` turns the
+ * shared dental mode on — only if dental mode was never chosen — and the old
+ * key is removed either way. Silent: the caller announces the change after
+ * mount. Returns true when it switched dental mode on.
+ */
+export const migrateLegacyIconStyle = (): boolean => {
+  const legacy = readString(LEGACY_ICON_STYLE_KEY);
+  if (legacy === null) return false;
+  const adopt = legacy === 'tooth' && readString(DENTAL_KEY) === null;
+  if (adopt) applyDental(true, { silent: true });
+  removeKey(LEGACY_ICON_STYLE_KEY);
+  return adopt;
 };
 
-const write = (value: IconStyle): void => {
-  try {
-    window.localStorage.setItem(STORAGE_KEY, value);
-  } catch {
-    // ignore quota / privacy mode errors
-  }
-};
-
+/** Mark style bound to the shared dental mode: tooth = dental on, classic = off. */
 export const useIconStyle = (): {
   style: IconStyle;
   setStyle: (next: IconStyle) => void;
   toggle: () => void;
 } => {
-  const [style, setStyleState] = useState<IconStyle>(() => read());
+  // Runs before useDental reads the preference, so the first paint is already right.
+  const [migrated] = useState(migrateLegacyIconStyle);
+  const [dental, setDental] = useDental();
 
-  const setStyle = useCallback((next: IconStyle) => {
-    setStyleState((prev) => {
-      if (prev === next) return prev;
-      write(next);
-      return next;
-    });
-  }, []);
+  useEffect(() => {
+    // Tell the rest of the page (portal / shell toggles) about the migrated value.
+    if (migrated) applyDental(readDental());
+  }, [migrated]);
 
-  const toggle = useCallback(() => {
-    setStyleState((prev) => {
-      const next: IconStyle = prev === 'tooth' ? 'classic' : 'tooth';
-      write(next);
-      return next;
-    });
-  }, []);
+  const setStyle = useCallback((next: IconStyle) => setDental(next === 'tooth'), [setDental]);
+  const toggle = useCallback(() => setDental(!dental), [dental, setDental]);
 
-  return { style, setStyle, toggle };
+  return { style: dental ? 'tooth' : 'classic', setStyle, toggle };
 };
