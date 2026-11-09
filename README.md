@@ -48,7 +48,6 @@ Every game is a standalone repo that also plugs into the portal. They share one 
 
 ## ✨ Features
 
-- 🦷 **Dental mode** — `Healthy` (X) vs chipped `Decayed` (O) tooth icons, driven by the arcade-wide **Dental mode** (`arcade.dental`, off by default: classic `X` / `O`); switch it in Settings, the arcade top bar or with **I**. An old `tictactoe.iconStyle = 'tooth'` choice is migrated once (only if dental mode was never set) and the old key removed
 - 🎮 **Four modes** — Player-vs-Player, Easy (random AI), Medium (heuristic AI), Hard (α-β minimax — **never loses**)
 - 🏆 **Unified arcade scoring** — every round is scored with the shared duel formula; best score, plays and wins are shared with the portal
 - 🔥 **Per-mode best streaks** — PvP / Easy / Medium / Hard each keep their own all-time win-streak record
@@ -58,6 +57,8 @@ Every game is a standalone repo that also plugs into the portal. They share one 
 - ⚡ **AI speed** — Instant / 0.15 s / 0.4 s / 1 s thinking delay, remembered
 - 🔔 **Optional sound** — procedural Web Audio beeps on placement, win and draw; off by default
 - 🌗 **Dark / light theme** shared with every arcade game (press **T**)
+- 🌍 **Three languages** — English, Hungarian and German; switch in the top bar or in the settings (also `?lang=en|hu|de` for link hand-off); numbers follow the locale's grouping
+- 🦷 **Dental mode** — a „Fogas mód” / "Dental mode" / „Zahnmodus” toggle in the settings, off by default (or `?dental=1`), shared across the whole arcade. With dental mode on, X and O become a healthy and a decayed tooth; off shows classic X/O. Toggle it in the settings, the top-bar switch or **I**; an old `tictactoe.iconStyle = 'tooth'` choice is migrated once to `arcade.dental`. Presentation only
 - 🤖 **Attract-mode demo** (`<TicTacToeDemo />`) — two AIs of mixed strength play the real engine on the portal's landing page
 - ⌨️ **Keyboard-first**; hotkeys are ignored while you type in a form field or hold Cmd/Ctrl/Alt
 - 🧪 **Tested** — every winning line, draws, an *exhaustive* proof that the hard AI never loses, scoring, the save validator and component behaviour
