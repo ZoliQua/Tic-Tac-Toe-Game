@@ -20,7 +20,8 @@ export type TicTacToeMessageKey =
   | 'sound'
   | 'board' | 'cellEmpty' | 'cellMark' | 'cellHealthy' | 'cellDecayed'
   | 'kbdSpace'
-  | 'keyMove' | 'keyPlace' | 'keyPause' | 'keyNewRound' | 'keyMode' | 'keyIcons' | 'keyReset';
+  | 'keyMove' | 'keyPlace' | 'keyPause' | 'keyNewRound' | 'keyMode' | 'keyIcons' | 'keyReset'
+  | 'rulesDiagramLabel' | 'rulesDiagramRow' | 'rulesGoal' | 'rulesPlayKeys' | 'rulesPlayTouch' | 'rulesRulesWin' | 'rulesRulesTurn' | 'rulesRulesSave' | 'rulesScoringIntro' | 'rulesScoringMode' | 'rulesScoringPvp' | 'rulesScoringFinish' | 'rulesDentalText' | 'rulesMobileTap' | 'rulesMobileFs' | 'touchTap' | 'touchTapAction';
 
 export const MESSAGES: Messages<TicTacToeMessageKey> = {
   en: {
@@ -90,6 +91,23 @@ export const MESSAGES: Messages<TicTacToeMessageKey> = {
     keyMode: 'Cycle / pick mode',
     keyIcons: 'Dental mode (teeth ↔ X/O marks)',
     keyReset: 'Reset match scores',
+    rulesDiagramLabel: 'Diagram: three marks in a row on the 3×3 board, struck through and ticked — that wins the round.',
+    rulesDiagramRow: 'three in a row',
+    rulesGoal: 'Place three of your marks in a row — across, down or diagonally — before your opponent does.',
+    rulesPlayKeys: 'Move the cursor with the arrow keys or WASD and place a mark with Enter or Space, or just click a square. P or Esc pauses, R starts a new round, N or 1–4 changes the mode.',
+    rulesPlayTouch: 'Tap an empty square to place your mark. Tap Pause to stop, New round to start over, and pick the mode in the Mode panel.',
+    rulesRulesWin: 'X and O take turns; you are X. Three in a row wins the round; a full board without a line is a draw. The loser opens the next round.',
+    rulesRulesTurn: 'Hard never loses, so against it a draw is a good result. Changing the mode starts a new match.',
+    rulesRulesSave: 'Your match is autosaved, so you can leave and continue later.',
+    rulesScoringIntro: 'Every round against the AI is ranked. A win pays more the fewer squares are filled, a draw a quarter of the base, a loss nothing:',
+    rulesScoringMode: '{mode}: win {min}–{max}, draw {draw}',
+    rulesScoringPvp: 'PvP rounds are just for fun and score {zero}.',
+    rulesScoringFinish: 'Finish early ends the current round and ranks its score, which is {zero} until the round is decided.',
+    rulesDentalText: 'Dental mode only changes the look: X is a healthy tooth and O a chipped, decayed one. Rules and scoring stay the same.',
+    rulesMobileTap: 'Tap a square to place your mark; the squares are big enough for a thumb.',
+    rulesMobileFs: 'The "Full screen" button hides the browser bars.',
+    touchTap: 'Tap',
+    touchTapAction: 'Place a mark',
   },
   hu: {
     titleTooth: 'Fogas Tic-Tac-Toe',
@@ -158,6 +176,23 @@ export const MESSAGES: Messages<TicTacToeMessageKey> = {
     keyMode: 'Mód léptetése / választása',
     keyIcons: 'Fogas mód (fogak ↔ X/O jelek)',
     keyReset: 'Meccs eredményének nullázása',
+    rulesDiagramLabel: 'Ábra: három jel egy sorban a 3×3-as táblán, áthúzva és pipával – ez nyeri a kört.',
+    rulesDiagramRow: 'három egy sorban',
+    rulesGoal: 'Rakj le három jelet egy sorba – vízszintesen, függőlegesen vagy átlósan –, mielőtt az ellenfeled megteszi.',
+    rulesPlayKeys: 'A kurzort a nyílbillentyűkkel vagy WASD-vel mozgasd, a jelet Enterrel vagy szóközzel rakd le, vagy kattints egy mezőre. P vagy Esc szüneteltet, R új kört kezd, N vagy 1–4 módot vált.',
+    rulesPlayTouch: 'Koppints egy üres mezőre a jeled lerakásához. A Szünet gombbal megállíthatod, az Új körrel újrakezdheted, a módot pedig a Mód panelen választod.',
+    rulesRulesWin: 'X és O felváltva lép; te az X vagy. Három egy sorban megnyeri a kört; teli tábla vonal nélkül döntetlen. A vesztes kezdi a következő kört.',
+    rulesRulesTurn: 'A Nehéz soha nem veszít, ezért ellene a döntetlen jó eredmény. A mód váltása új meccset kezd.',
+    rulesRulesSave: 'A meccsed automatikusan mentődik, így később folytathatod.',
+    rulesScoringIntro: 'Minden kör az MI ellen rangsorolt. A győzelem annál többet ér, minél kevesebb mező telt meg, a döntetlen az alap negyedét, a vereség semmit:',
+    rulesScoringMode: '{mode}: győzelem {min}–{max}, döntetlen {draw}',
+    rulesScoringPvp: 'A PvP körök csak szórakozásból vannak, és {zero} pontot érnek.',
+    rulesScoringFinish: 'Az idő előtti befejezés lezárja az aktuális kört, és annak pontszámát rangsorolja – ez {zero}, amíg a kör el nem dől.',
+    rulesDentalText: 'A fogas mód csak a megjelenést változtatja: az X egy ép fog, az O egy kicsorbult, szuvas fog. A szabályok és a pontozás ugyanazok maradnak.',
+    rulesMobileTap: 'Koppints egy mezőre a jeled lerakásához; a mezők elég nagyok egy hüvelykujjnak.',
+    rulesMobileFs: 'A „Teljes képernyő” gomb eltünteti a böngészősávokat.',
+    touchTap: 'Koppintás',
+    touchTapAction: 'Jel lerakása',
   },
   de: {
     titleTooth: 'Zahn-Tic-Tac-Toe',
@@ -226,6 +261,23 @@ export const MESSAGES: Messages<TicTacToeMessageKey> = {
     keyMode: 'Modus wechseln / wählen',
     keyIcons: 'Zahnmodus (Zähne ↔ X/O-Symbole)',
     keyReset: 'Spielstand zurücksetzen',
+    rulesDiagramLabel: 'Diagramm: drei Zeichen in einer Reihe auf dem 3×3-Feld, durchgestrichen und abgehakt – das gewinnt die Runde.',
+    rulesDiagramRow: 'drei in einer Reihe',
+    rulesGoal: 'Setze drei deiner Zeichen in eine Reihe – waagerecht, senkrecht oder diagonal –, bevor dein Gegner es schafft.',
+    rulesPlayKeys: 'Bewege den Cursor mit den Pfeiltasten oder WASD und setze mit Enter oder Leertaste ein Zeichen, oder klicke einfach ein Feld an. P oder Esc pausiert, R startet eine neue Runde, N oder 1–4 wechselt den Modus.',
+    rulesPlayTouch: 'Tippe auf ein leeres Feld, um dein Zeichen zu setzen. Mit Pause hältst du an, mit Neue Runde fängst du neu an, den Modus wählst du im Modus-Feld.',
+    rulesRulesWin: 'X und O sind abwechselnd dran; du bist X. Drei in einer Reihe gewinnen die Runde; ein volles Feld ohne Reihe ist ein Unentschieden. Der Verlierer eröffnet die nächste Runde.',
+    rulesRulesTurn: 'Schwer verliert nie, ein Unentschieden ist dagegen also ein gutes Ergebnis. Ein Moduswechsel startet ein neues Match.',
+    rulesRulesSave: 'Dein Match wird automatisch gespeichert, du kannst also später weitermachen.',
+    rulesScoringIntro: 'Jede Runde gegen die KI wird gewertet. Ein Sieg bringt mehr, je weniger Felder belegt sind, ein Unentschieden ein Viertel der Basis, eine Niederlage nichts:',
+    rulesScoringMode: '{mode}: Sieg {min}–{max}, Unentschieden {draw}',
+    rulesScoringPvp: 'PvP-Runden sind nur zum Spaß und bringen {zero} Punkte.',
+    rulesScoringFinish: '„Beenden“ schließt die aktuelle Runde ab und wertet ihre Punkte – das sind {zero}, solange die Runde nicht entschieden ist.',
+    rulesDentalText: 'Der Zahnmodus ändert nur das Aussehen: X ist ein gesunder Zahn, O ein angeschlagener, kariöser. Regeln und Punktewertung bleiben gleich.',
+    rulesMobileTap: 'Tippe auf ein Feld, um dein Zeichen zu setzen; die Felder sind groß genug für einen Daumen.',
+    rulesMobileFs: 'Der Knopf „Vollbild“ blendet die Browserleisten aus.',
+    touchTap: 'Tippen',
+    touchTapAction: 'Zeichen setzen',
   },
 };
 

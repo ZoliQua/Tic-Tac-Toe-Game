@@ -4,12 +4,17 @@ import {
   DUEL_BASE_POINTS,
   formatClock,
   formatNumber,
+  FinishButton,
+  FullscreenButton,
   gameName,
   GameOverlay,
   KeyHelp,
+  RulesButton,
   SaveBadge,
   StatPanel,
+  TouchHelp,
   useArcadeRun,
+  useImmersive,
   useKitMessages,
   useLang,
   useMessages,
@@ -35,6 +40,7 @@ import { useSound } from './hooks/useSound';
 import { advanceGame, aiMarkFor, createInitialState, MODES, roundOutcome } from './logic/game';
 import { moveFocus } from './logic/grid';
 import { isTicTacToeSession } from './logic/persist';
+import { useRulesSections } from './rules';
 import type { GameAction, GameState, Mark, Mode, SavedGame } from './logic/types';
 import styles from './App.module.css';
 
@@ -69,8 +75,9 @@ const markName = (mark: Mark, iconStyle: IconStyle, t: T): string => {
 };
 
 // Best streaks are all-time records with their own storage, not session data.
-const toSaved = ({ bestStreaks, ...rest }: GameState): SavedGame => {
+const toSaved = ({ bestStreaks, finishedEarly, ...rest }: GameState): SavedGame => {
   void bestStreaks;
+  void finishedEarly;
   return rest;
 };
 
@@ -100,19 +107,25 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
   const [welcomeBack, setWelcomeBack] = useState(restored !== null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [showResult, setShowResult] = useState(false);
+  // The Finish confirm is open: the AI and the clock stand still without leaving `running`.
+  const [finishOpen, setFinishOpen] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const immersive = useImmersive(rootRef);
+  const rulesSections = useRulesSections();
 
   const { style: iconStyle, toggle: toggleIconStyle } = useIconStyle();
   const { speed: aiSpeed, delayMs: aiDelay, setSpeed: setAISpeed } = useAIDelay();
   const sound = useSound();
   useBestStreaks(state.bestStreaks);
 
-  const roundOver = state.status !== 'playing';
+  const finished = state.finishedEarly === true;
+  const roundOver = state.status !== 'playing' || finished;
   const status: ArcadeStatus =
     phase === 'idle' ? 'idle' : roundOver ? 'gameOver' : phase === 'paused' ? 'paused' : 'running';
   const running = status === 'running';
   const ranked = state.mode !== 'pvp';
 
-  const seconds = useRunTimer(running, runKey, runKey === 0 && restoredInProgress ? (restored?.seconds ?? 0) : 0);
+  const seconds = useRunTimer(running && !finishOpen, runKey, runKey === 0 && restoredInProgress ? (restored?.seconds ?? 0) : 0);
 
   const stats = useArcadeRun({
     gameId: 'tictactoe',
@@ -120,7 +133,7 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
     score: state.roundScore,
     seconds,
     runKey,
-    outcome: () => roundOutcome(state),
+    outcome: () => (state.finishedEarly ? 'finished' : roundOutcome(state)),
     ranked,
     props,
   });
@@ -131,8 +144,8 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
     schema: SESSION_SCHEMA,
     // The whole match (board, scores, streak, points) is the session: it is
     // kept between rounds and only dropped on an explicit discard.
-    enabled: phase !== 'idle',
-    discard: phase === 'idle',
+    enabled: phase !== 'idle' && !finished,
+    discard: phase === 'idle' || finished,
     data: saved,
     seconds,
     score: state.points,
@@ -140,7 +153,7 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
 
   const aiMark = aiMarkFor(state);
   const humanTurn = aiMark === null || state.current !== aiMark;
-  useAITurn(state, dispatch, aiDelay, running && !confirmOpen);
+  useAITurn(state, dispatch, aiDelay, running && !confirmOpen && !finishOpen);
 
   // Sound: a click per placed mark, a chime when a round ends.
   const lastMovesRef = useRef(state.moveCount);
@@ -179,6 +192,17 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
     // The idle state already holds a fresh round; just open it.
     beginRound(null);
   }, [beginRound]);
+
+  const openRules = useCallback((open: boolean) => {
+    if (!open) return;
+    setPhase((p) => (p === 'live' ? 'paused' : p));
+  }, []);
+
+  const finishEarly = useCallback(() => {
+    setWelcomeBack(false);
+    setConfirmOpen(false);
+    dispatch({ type: 'finish' });
+  }, []);
 
   const newRound = useCallback(() => {
     if (phase === 'idle') beginRound(null);
@@ -234,10 +258,10 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
 
   const place = useCallback(
     (index: number) => {
-      if (status !== 'running' || !humanTurn) return;
+      if (status !== 'running' || !humanTurn || finishOpen) return;
       dispatch({ type: 'place', index });
     },
-    [status, humanTurn],
+    [status, humanTurn, finishOpen],
   );
   const focusCell = useCallback((index: number) => dispatch({ type: 'focus', index }), []);
 
@@ -316,10 +340,11 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
             { label: t('newRound'), onClick: newRound, kbd: 'R' },
           ],
         };
-  } else if (status === 'gameOver' && showResult) {
+  } else if (status === 'gameOver' && (showResult || finished)) {
     const outcome = roundOutcome(state);
     let title: string;
-    if (outcome === 'draw') title = t('draw');
+    if (finished) title = k('finishedEarly');
+    else if (outcome === 'draw') title = t('draw');
     else if (aiMark === null) title = t('markWins', { mark: markName(state.winner as Mark, iconStyle, t) });
     else title = t(outcome === 'win' ? 'youWin' : 'aiWins');
     const message = ranked
@@ -334,6 +359,7 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
 
   return (
     <div
+      ref={rootRef}
       className={`arc-game ${styles.game}`}
       style={{ '--game-color': 'var(--game-tictactoe)' } as CSSProperties}
     >
@@ -372,13 +398,13 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
       />
 
       <div className={styles.layout}>
-        <div className={`arc-game__board ${styles.boardWrap}`}>
+        <div className={`arc-game__board arc-board-tap ${styles.boardWrap}`}>
           <GameBoard
             board={state.board}
             winningLine={state.winningLine}
             iconStyle={iconStyle}
             focusIndex={state.focusIndex}
-            interactive={running && humanTurn && !confirmOpen}
+            interactive={running && humanTurn && !confirmOpen && !finishOpen}
             draw={state.status === 'draw'}
             onSelect={place}
             onFocusCell={focusCell}
@@ -406,6 +432,11 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
               <button type="button" className="arc-btn" onClick={newRound} disabled={status === 'idle'}>
                 {t('newRound')}
               </button>
+            </div>
+            <div className={styles.tools}>
+              <RulesButton sections={rulesSections} gameId="tictactoe" onOpenChange={openRules} hotkey={false} />
+              <FinishButton score={state.roundScore} visible={phase !== 'idle' && !roundOver} onFinish={finishEarly} onOpenChange={setFinishOpen} />
+              <FullscreenButton immersive={immersive} />
             </div>
             <button
               type="button"
@@ -441,6 +472,7 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
           <section className="arc-panel">
             <h2 className="arc-panel__title">{t('panelKeys')}</h2>
             <KeyHelp rows={keyRows(t)} />
+            <TouchHelp rows={[[t('touchTap'), t('touchTapAction')]]} />
           </section>
         </aside>
       </div>

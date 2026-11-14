@@ -144,7 +144,7 @@ const applyResultToScores = (state: GameState, board: Board): GameState => {
 };
 
 const tryPlace = (state: GameState, index: number, mark: Mark): GameState => {
-  if (state.status !== 'playing') return state;
+  if (state.status !== 'playing' || state.finishedEarly) return state;
   if (!Number.isInteger(index) || index < 0 || index > 8) return state;
   if (state.board[index] !== null) return state;
   if (state.current !== mark) return state;
@@ -168,7 +168,7 @@ export const advanceGame = (
     }
 
     case 'aiMove': {
-      if (state.status !== 'playing') return state;
+      if (state.status !== 'playing' || state.finishedEarly) return state;
       const aiMark = aiMarkFor(state);
       if (aiMark === null) return state;
       if (state.current !== aiMark) return state;
@@ -194,6 +194,7 @@ export const advanceGame = (
         moveCount: 0,
         focusIndex: 4,
         roundScore: 0,
+        finishedEarly: false,
       };
     }
 
@@ -215,8 +216,13 @@ export const advanceGame = (
         focusIndex: 4,
         points: 0,
         roundScore: 0,
+        finishedEarly: false,
       };
     }
+
+    case 'finish':
+      // Ends the round where it stands: no result, no score change (roundScore is still 0).
+      return state.status === 'playing' && !state.finishedEarly ? { ...state, finishedEarly: true } : state;
 
     case 'resetScores':
       return {

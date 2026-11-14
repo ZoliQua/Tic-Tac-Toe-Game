@@ -35,10 +35,12 @@ export type GameState = {
   points: number;
   /** Score of the current round: 0 while playing, set when the round ends. */
   roundScore: number;
+  /** The player ended the round with Finish; ranks `roundScore` as it stands. Never saved. */
+  finishedEarly?: boolean;
 };
 
 /** What a saved session stores: the whole match except the all-time best streaks. */
-export type SavedGame = Omit<GameState, 'bestStreaks'>;
+export type SavedGame = Omit<GameState, 'bestStreaks' | 'finishedEarly'>;
 
 export type GameAction =
   | { type: 'place'; index: number }
@@ -46,6 +48,7 @@ export type GameAction =
   | { type: 'newRound' }
   | { type: 'changeMode'; mode: Mode }
   | { type: 'resetScores' }
+  | { type: 'finish' }
   | { type: 'focus'; index: number };
 
 export type Rng = () => number;
