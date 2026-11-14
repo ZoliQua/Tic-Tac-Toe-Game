@@ -38,6 +38,20 @@ export const roundOutcome = (
   return state.winner === state.humanMark ? 'win' : 'loss';
 };
 
+/** Fewest marks a round can be won with (X's third mark is the 5th placed). */
+const FASTEST_WIN_MOVES = 5;
+
+/** Reachable win scores for a ranked mode: slowest (full board) to fastest (5 marks), from the real scoring. */
+export const winScoreRange = (mode: Exclude<Mode, 'pvp'>): { min: number; max: number } => {
+  const win = (moves: number) =>
+    duelRoundScore({ outcome: 'win', difficulty: difficultyFor(mode), moves, boardCells: BOARD_CELLS });
+  return { min: win(BOARD_CELLS), max: win(FASTEST_WIN_MOVES) };
+};
+
+/** Score of a drawn round in a ranked mode. */
+export const drawScore = (mode: Exclude<Mode, 'pvp'>): number =>
+  duelRoundScore({ outcome: 'draw', difficulty: difficultyFor(mode), moves: BOARD_CELLS, boardCells: BOARD_CELLS });
+
 const placeAt = (board: Board, index: number, mark: Mark): Board => {
   const next = board.slice() as Cell[];
   next[index] = mark;

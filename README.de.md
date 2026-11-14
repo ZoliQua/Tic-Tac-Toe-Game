@@ -55,9 +55,9 @@ Jedes Spiel ist ein eigenständiges Repo, das sich auch ins Portal einklinkt. Al
 
 ## ✨ Funktionen
 
-- 🎮 **Vier Modi** — Spieler gegen Spieler, Einfach (zufällige KI), Mittel (heuristische KI), Schwer (α-β-Minimax — **verliert nie**)
+- 🎮 **Vier Modi** — Spieler gegen Spieler, Leicht (zufällige KI), Mittel (heuristische KI), Schwer (α-β-Minimax — **verliert nie**)
 - 🏆 **Einheitliche Arcade-Wertung** — jede Runde wird mit der gemeinsamen Duell-Formel gewertet; Bestwert, Spiele und Siege werden mit dem Portal geteilt
-- 🔥 **Beste Serien pro Modus** — PvP / Einfach / Mittel / Schwer führen je einen eigenen Allzeit-Rekord für Siegesserien
+- 🔥 **Beste Serien pro Modus** — PvP / Leicht / Mittel / Schwer führen je einen eigenen Allzeit-Rekord für Siegesserien
 - 🔄 **Verlierer beginnt** — der Verlierer der letzten Runde eröffnet die nächste (bei Unentschieden und abgebrochenen Runden wechselt der Beginn)
 - ⏸️ **Pause** (P / Esc) — friert Feld, KI und Rundenuhr ein
 - 📖 **Regeln** — ein Knopf öffnet die Regeln mit Diagramm; wer sie mitten in der Runde öffnet, pausiert das Spiel
@@ -96,8 +96,8 @@ Produktions-Build: `npm run build && npm run preview`. Der Build nutzt relative 
 | **Enter** / **Leertaste** | Auf den Cursor setzen · starten · fortsetzen · nächste Runde |
 | **P** / **Esc** | Pause / Fortsetzen |
 | **R** | Neue Runde (die Match-Stände bleiben) |
-| **N** | Modus durchschalten (PvP → Einfach → Mittel → Schwer) |
-| **1** / **2** / **3** / **4** | Direkt zu PvP / Einfach / Mittel / Schwer (startet ein neues Match) |
+| **N** | Modus durchschalten (PvP → Leicht → Mittel → Schwer) |
+| **1** / **2** / **3** / **4** | Direkt zu PvP / Leicht / Mittel / Schwer (startet ein neues Match) |
 | **I** | Zeichen umschalten: Zähne ↔ klassisches X / O |
 | **C** | Match-Stände zurücksetzen (fragt vorher — **Enter** bestätigt, **Esc** behält) |
 | **Umschalt + C** | Match-Stände ohne Rückfrage zurücksetzen |
@@ -119,7 +119,7 @@ in die Bestenliste) und **Vollbild** blendet die Browserleisten aus. Auf dem iPh
 Jede **Runde ist ein Arcade-Lauf**. Endet eine Runde, wird sie mit der gemeinsamen `duelRoundScore` des Kits gewertet (dieselbe Formel wie bei Gomoku),
 aus Sicht des Menschen, mit `moves` = von beiden gesetzte Zeichen und `boardCells` = 9:
 
-| Ergebnis | Punkte | Einfach (Basis 100) | Mittel (Basis 250) | Schwer (Basis 500) |
+| Ergebnis | Punkte | Leicht (Basis 100) | Mittel (Basis 250) | Schwer (Basis 500) |
 | --- | --- | --- | --- | --- |
 | Sieg | `Basis × (1 + leere Felder / 9)` | 144 (Sieg in 5 Zügen) … 100 | 361 … 250 | **722** … 500 |
 | Unentschieden | `Basis / 4` | 25 | 63 | 125 |
@@ -195,7 +195,7 @@ playing ──┬── (Gewinnzug) ──────────────�
 | Modus | Spieler 1 (X) | Spieler 2 (O) | Zu gewinnen? |
 | --- | --- | --- | --- |
 | **PvP** | Mensch | Mensch (am selben Gerät) | Ja, durch beide Spieler |
-| **Einfach** | Mensch | KI (gleichverteilt zufällig) | Ja, fast immer |
+| **Leicht** | Mensch | KI (gleichverteilt zufällig) | Ja, fast immer |
 | **Mittel** | Mensch | KI (Heuristik in 5 Schritten) | Ja, mit Mühe |
 | **Schwer** | Mensch | KI (vollständiges α-β-Minimax) | **Nie.** Bestes Ergebnis ist ein Unentschieden |
 
@@ -219,7 +219,7 @@ der Zahnzustand. (Der Autor ist Zahnarzt.) Das interne Modell ist immer `'X'` / 
 
 ### 🎬 Demo
 
-`TicTacToeDemo` lässt KIs unterschiedlicher Stärke gegeneinander antreten (Mittel gegen Einfach, Einfach gegen Schwer, Schwer gegen Mittel, …), über die echte
+`TicTacToeDemo` lässt KIs unterschiedlicher Stärke gegeneinander antreten (Mittel gegen Leicht, Leicht gegen Schwer, Schwer gegen Mittel, …), über die echte
 `advanceGame`, ein Zug alle 400 ms, und startet 1,2 s nach jedem Ergebnis neu — im Wechsel mit Zahn- und X/O-Zeichen. Es hat keine Tastatur-Listener,
 keinen Ton, keine Statistik und keine Speicherzugriffe und friert ein, wenn `active` false ist.
 
@@ -242,7 +242,7 @@ src/
   arcade/              mitgeliefertes Zoltan's-Arcade-Kit — hier nicht bearbeiten (siehe dessen README)
   logic/               reine Spielregeln
     types.ts constants.ts grid.ts win.ts
-    ai.ts              Einfach / Mittel / Schwer (α-β-Minimax), RNG injiziert
+    ai.ts              Leicht / Mittel / Schwer (α-β-Minimax), RNG injiziert
     game.ts            advanceGame-Reducer, createInitialState, roundOutcome, Wertung
     autopilot.ts       KI-gegen-KI-Treiber + Seed-RNG für die Demo
     persist.ts         strenge Laufzeitprüfung gespeicherter Sitzungen

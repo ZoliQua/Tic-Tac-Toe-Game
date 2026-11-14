@@ -1,6 +1,5 @@
 import type { ReactNode } from 'react';
 import {
-  DUEL_BASE_POINTS,
   formatNumber,
   Tooth,
   useDental,
@@ -11,6 +10,7 @@ import {
   type RulesSection,
 } from './arcade';
 import { MESSAGES, MODE_KEY } from './i18n';
+import { drawScore, winScoreRange } from './logic/game';
 
 const SIZE = 36;
 const GAP = 6;
@@ -106,9 +106,9 @@ export function useRulesSections(): RulesSection[] {
               <li key={mode}>
                 {m('rulesScoringMode', {
                   mode: m(MODE_KEY[mode]),
-                  min: num(DUEL_BASE_POINTS[mode]),
-                  max: num(DUEL_BASE_POINTS[mode] * 2),
-                  draw: num(Math.round(DUEL_BASE_POINTS[mode] / 4)),
+                  min: num(winScoreRange(mode).min),
+                  max: num(winScoreRange(mode).max),
+                  draw: num(drawScore(mode)),
                 })}
               </li>
             ))}

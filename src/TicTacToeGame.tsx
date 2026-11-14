@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useReducer, useRef, useState, type CSSProperties } from 'react';
 import {
   clearSession,
-  DUEL_BASE_POINTS,
   formatClock,
   formatNumber,
   FinishButton,
@@ -37,7 +36,7 @@ import { readBestStreaks, useBestStreaks } from './hooks/useBestStreak';
 import { useIconStyle, type IconStyle } from './hooks/useIconStyle';
 import { useKeyboardSelect } from './hooks/useKeyboardSelect';
 import { useSound } from './hooks/useSound';
-import { advanceGame, aiMarkFor, createInitialState, MODES, roundOutcome } from './logic/game';
+import { advanceGame, aiMarkFor, createInitialState, MODES, roundOutcome, winScoreRange } from './logic/game';
 import { moveFocus } from './logic/grid';
 import { isTicTacToeSession } from './logic/persist';
 import { useRulesSections } from './rules';
@@ -456,7 +455,7 @@ export function TicTacToeGame(props: ArcadeGameProps = {}) {
             <p className={styles.note}>
               {state.mode === 'pvp'
                 ? t('notePvp')
-                : t('noteRanked', { min: num(DUEL_BASE_POINTS[state.mode]), max: num(DUEL_BASE_POINTS[state.mode] * 2) })}
+                : t('noteRanked', { min: num(winScoreRange(state.mode).min), max: num(winScoreRange(state.mode).max) })}
             </p>
           </section>
 

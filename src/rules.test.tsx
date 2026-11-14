@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { applyDental, applyLang, DUEL_BASE_POINTS, formatNumber } from './arcade';
+import { applyDental, applyLang, duelRoundScore, formatNumber } from './arcade';
 import { TicTacToeGame } from './TicTacToeGame';
 import { setCoarsePointer } from './test/touchEnv';
 
@@ -54,13 +54,33 @@ describe('Tic-Tac-Toe rules dialog', () => {
     expect(dialog.textContent).toContain('Teljes képernyő');
   });
 
-  it('prints every scoring number', () => {
+  it('prints the real score ranges as full sentences (hu and de)', () => {
+    const win = (base: 'easy' | 'medium' | 'hard', moves: number) =>
+      duelRoundScore({ outcome: 'win', difficulty: base, moves, boardCells: 9 });
+    const draw = (d: 'easy' | 'medium' | 'hard') => duelRoundScore({ outcome: 'draw', difficulty: d, moves: 9, boardCells: 9 });
+    const n = (v: number, l: 'hu' | 'de') => formatNumber(v, l);
+    const names = { hu: { easy: 'Könnyű', medium: 'Közepes', hard: 'Nehéz' }, de: { easy: 'Leicht', medium: 'Mittel', hard: 'Schwer' } };
+    const sentence = (l: 'hu' | 'de', d: 'easy' | 'medium' | 'hard') =>
+      l === 'hu'
+        ? `${names.hu[d]}: győzelem ${n(win(d, 9), l)}–${n(win(d, 5), l)}, döntetlen ${n(draw(d), l)}`
+        : `${names.de[d]}: Sieg ${n(win(d, 9), l)}–${n(win(d, 5), l)}, Unentschieden ${n(draw(d), l)}`;
+    expect(win('medium', 5)).toBe(361);
+    expect(win('hard', 5)).toBe(722);
+    expect(win('easy', 5)).toBe(144);
     render(<TicTacToeGame />);
     openRules();
-    const text = screen.getByRole('dialog', { name: /szabályok/ }).textContent ?? '';
-    for (const base of Object.values(DUEL_BASE_POINTS)) {
-      for (const n of [base, base * 2, Math.round(base / 4)]) expect(text).toContain(formatNumber(n, 'hu'));
-    }
+    let text = screen.getByRole('dialog', { name: /szabályok/ }).textContent ?? '';
+    for (const d of ['easy', 'medium', 'hard'] as const) expect(text).toContain(sentence('hu', d));
+    expect(text).toContain('Közepes: győzelem 250–361, döntetlen 63');
+    act(() => applyLang('de'));
+    text = screen.getByRole('dialog', { name: /Regeln/ }).textContent ?? '';
+    for (const d of ['easy', 'medium', 'hard'] as const) expect(text).toContain(sentence('de', d));
+  });
+
+  it('the Mode panel note shows the same real range', () => {
+    render(<TicTacToeGame />);
+    expect(document.body.textContent).toContain('250–361');
+    expect(document.body.textContent).not.toContain('250–500');
   });
 
   it('has a described diagram', () => {
