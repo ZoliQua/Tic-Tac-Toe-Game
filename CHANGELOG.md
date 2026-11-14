@@ -4,6 +4,16 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and the project uses
 [Semantic Versioning](https://semver.org/).
 
+## [2.3.0] — 2026-11-14
+
+### Added
+
+- Rules dialog with a three-in-a-row diagram (opening it pauses the round).
+- Finish early: ends the current round on purpose and ranks its score ("Finished early" on the game-over card).
+- Touch controls: tap a square to play, with a "Tap" hint in the Keys panel; the board never zooms or scrolls under a finger.
+- Full-screen button (on iPhone a bar-free view with safe-area insets).
+- README in English, German and Hungarian; the family table lists all fifteen games, including Snapszer.
+
 ## [2.2.1] — 2026-11-14
 
 ### Changed

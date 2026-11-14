@@ -1,7 +1,9 @@
 # 🦷 Tic-Tac-Toe — Tooth Edition
 
-A minimal, type-safe Tic-Tac-Toe with **dental tooth icons** (or classic X / O) built with **React 18**, **Vite** and **TypeScript** — keyboard-first, grid-based DOM, no canvas, no game engine.
-Runs on its own **and** as one of the fourteen games of **[Zoltan's Arcade](https://github.com/ZoliQua/Arcade-Game-Center)**.
+**English** · [Deutsch](README.de.md) · [Magyar](README.hu.md)
+
+A minimal, type-safe Tic-Tac-Toe with **dental tooth icons** (or classic X / O) built with **React 18**, **Vite** and **TypeScript** — keyboard- and touch-friendly, grid-based DOM, no canvas, no game engine.
+Runs on its own **and** as one of the fifteen games of **[Zoltan's Arcade](https://github.com/ZoliQua/Arcade-Game-Center)**.
 
 [![CI](https://github.com/ZoliQua/Tic-Tac-Toe-Game/actions/workflows/ci.yml/badge.svg)](https://github.com/ZoliQua/Tic-Tac-Toe-Game/actions/workflows/ci.yml)
 ![license](https://img.shields.io/badge/license-MIT-green)
@@ -18,6 +20,7 @@ Runs on its own **and** as one of the fourteen games of **[Zoltan's Arcade](http
 - [Features](#-features)
 - [Quick start](#-quick-start)
 - [Controls](#%EF%B8%8F-controls)
+- [On a phone](#-on-a-phone)
 - [Scoring & stats](#-scoring--stats)
 - [Autosave & resume](#-autosave--resume)
 - [Embedding in Arcade-Game-Center](#-embedding-in-arcade-game-center)
@@ -48,6 +51,7 @@ Every game is a standalone repo that also plugs into the portal. They share one 
 | 💣 Minesweeper | [Minesweeper-Game](https://github.com/ZoliQua/Minesweeper-Game) | Logic |
 | ♠️ Solitaire | [Solitaire-Game](https://github.com/ZoliQua/Solitaire-Game) | Cards |
 | 🎴 Ulti | [Ulti-Game](https://github.com/ZoliQua/Ulti-Game) | Cards |
+| 🂡 Snapszer | [Snapszer-Game](https://github.com/ZoliQua/Snapszer-Game) | Cards |
 
 ## ✨ Features
 
@@ -56,6 +60,9 @@ Every game is a standalone repo that also plugs into the portal. They share one 
 - 🔥 **Per-mode best streaks** — PvP / Easy / Medium / Hard each keep their own all-time win-streak record
 - 🔄 **Loser-goes-first** — the previous round's loser opens the next round (draws and abandoned rounds alternate)
 - ⏸️ **Pause** (P / Esc) — freezes the board, the AI and the round timer
+- 📖 **Rules** — a button opens the rules with a diagram; opening it mid-round pauses the game
+- 🏁 **Finish early** — ends the current round on purpose after a confirm and ranks its score
+- 📱 **Touch and full screen** — tap a square to play; a full-screen button hides the browser bars
 - 💾 **Autosave & resume** — the whole match (board, scores, streak, points) survives reloads and tab closes
 - ⚡ **AI speed** — Instant / 0.15 s / 0.4 s / 1 s thinking delay, remembered
 - 🔔 **Optional sound** — procedural Web Audio beeps on placement, win and draw; off by default
@@ -84,6 +91,7 @@ Production build: `npm run build && npm run preview`. The build uses relative as
 | Key | Action |
 | --- | --- |
 | 🖱️ Click / tap | Place your mark on a cell |
+| **Rules** button | Open the rules (pauses the round; **R** stays *New round*) |
 | ⬆️ ⬇️ ⬅️ ➡️ / **W A S D** | Move the cell cursor (clamped, no row wrap) |
 | **Enter** / **Space** | Place on the cursor · start · resume · next round |
 | **P** / **Esc** | Pause / resume |
@@ -99,6 +107,12 @@ Production build: `npm run build && npm run preview`. The build uses relative as
 > and T the arcade-wide theme key, so those moved to **C** (plus the *Reset scores* button) and **I**.
 
 Arrow keys call `preventDefault()` so the page never scrolls. Cells are real `<button>`s with `aria-label`s (`Row 1, column 3, healthy tooth`).
+
+### 📱 On a phone
+
+Tap an empty square to place your mark; the squares are large touch targets and the page does not zoom or scroll while you play.
+The **Rules** button explains the game, **Finish** ends the current round early (the round's score — 0 until it is decided — goes
+on the leaderboard) and **Full screen** hides the browser bars. On an iPhone use *Share → Add to Home Screen* for a bar-free view.
 
 ## 🎯 Scoring & stats
 
@@ -127,6 +141,7 @@ The stat strip shows:
 Every finished round is recorded once by the kit under `arcade.stats.tictactoe` (`best`, `plays`, `wins`, `totalScore`,
 `totalSeconds`, `lastScore`, `lastPlayedAt`). PvP rounds are recorded as unranked (`ranked: false`, from player 1 = X's side):
 they count as plays but never touch Best or the leaderboard, and `onGameOver` is not called for them.
+A round finished early ranks its current score (0 until the round is decided) and calls `onGameOver(score, { finished: true })`.
 Per-mode best streaks keep their pre-kit keys `tictactoe.highScore.<mode>` (a streak, not a score — so it is not migrated into
 arcade stats); the legacy single key `tictactoe.highScore` is still migrated into the Hard record once.
 
@@ -138,7 +153,7 @@ It is saved about once a second, whenever the page is hidden and when the game u
 closing the tab after a round never loses your W–L–D or points. Reloading shows **Welcome back** with the match paused
 (*Continue* · *New round* · *New match*); a round that had already finished is not replayed — the match continues with a fresh round.
 Only an explicit action drops it: **Discard** next to the *Autosaved* badge (back to a fresh, idle board), *Reset scores*, or
-changing the mode (a new match).
+changing the mode (a new match). Finishing a round early deletes the save; the next round starts saving again.
 
 ## 🧩 Embedding in Arcade-Game-Center
 
@@ -147,7 +162,7 @@ import { TicTacToeGame, TicTacToeDemo } from '@arcade/tictactoe';
 
 <TicTacToeGame
   embedded                                   // hide the page title; the portal shows it
-  onGameOver={(score) => submitScore('tictactoe', score)}   // ranked rounds with points > 0
+  onGameOver={(score) => submitScore('tictactoe', score)}   // ranked rounds with points > 0, or a round finished early (second argument { finished: true }, even at 0)
   onRunEnd={(run) => console.log(run.outcome, run.ranked)}  // every round, PvP included
   onStatusChange={({ status, score, seconds }) => updateHeader(status, seconds)}
 />
@@ -173,7 +188,7 @@ playing ──┬── (winning move) ───────────→ won 
 2. **`aiMove`** asks `bestMove(board, mark, mode, rng)` for the AI's cell. The RNG is injected, so tests are deterministic.
 3. **Win check first**, then draw check — a winning ninth mark is a win, never a draw.
 4. A finished round is **scored** with `duelRoundScore`; points, W–L–D and the streak are updated in the same step.
-5. **`newRound`** clears the board and keeps the match; **`changeMode`** starts a new match; **`resetScores`** zeroes it.
+5. **`newRound`** clears the board and keeps the match; **`changeMode`** starts a new match; **`resetScores`** zeroes it; **`finish`** ends the round early without a result.
 
 ### 🤖 Game modes & AI
 
@@ -190,7 +205,7 @@ Hard runs full minimax with α-β pruning over the 3×3 tree (well under 1 ms pe
 walking **every** possible human reply from the empty board, with the human moving first and second.
 
 `useAITurn` schedules the AI move after the chosen delay only while the round is running (not idle, paused or behind the
-reset dialog); the timer is cancelled on every state change and on unmount, so no stale move ever lands.
+reset or finish dialog); the timer is cancelled on every state change and on unmount, so no stale move ever lands.
 
 ### 🦷 Tooth icons
 
@@ -235,6 +250,7 @@ src/
   components/          GameBoard (full + mini), Cell, ToothIcon, WinningLine, ModeSelect, AISpeedToggle,
                        DentalToggle, SoundToggle
   demo/TicTacToeDemo.tsx  landing-page attract mode
+  rules.tsx            rules sections and the three-in-a-row diagram
   TicTacToeGame.tsx    the embeddable game (ArcadeGameProps)
   App.tsx              standalone page: <ArcadeShell><TicTacToeGame/></ArcadeShell>
   main.tsx             entry; loads the shared arcade.css once
